@@ -1,15 +1,15 @@
-﻿{
-  "name": "caso1-task-manager",
+{
+  "name": "@course/module-01",
   "version": "1.0.0",
-  "description": "Sistema de Gestion de Tareas - Caso 1",
+  "description": "Lab 1: Introducción a TypeScript - Tipos base",
   "main": "dist/index.js",
   "scripts": {
+    "dev": "ts-node src/index.ts",
     "build": "tsc",
-    "watch": "tsc --watch",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "test": "ts-node src/index.ts"
   },
   "dependencies": {},
   "devDependencies": {
-    
   }
 }
