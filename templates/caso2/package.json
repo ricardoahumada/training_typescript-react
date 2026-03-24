@@ -1,0 +1,17 @@
+{
+  "name": "caso2-template",
+  "version": "1.0.0",
+  "description": "Template Caso 2: Sistema de Biblioteca",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "start": "node dist/index.js"
+  },
+  "keywords": ["typescript", "template"],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    
+  }
+}
