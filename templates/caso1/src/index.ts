@@ -92,8 +92,6 @@ function evalTarea(task: { nombre: string; estado: Status }): number | never {
   }
 }
 
-
-
 type User = { type: "user"; name: string };
 type Product = { type: "product"; price: number };
 
@@ -131,18 +129,19 @@ function isAssigned(task: Task): task is Task & { assigneeId: string } {
   return task.assigneeId !== undefined;
 }
 
-function filterTasks(tasks: Task[], filter: {
-  status?: TaskStatus;
-  priority?: TaskPriority;
-}): Task[] {
-  return tasks.filter(task => {
+function filterTasks(
+  tasks: Task[],
+  filter: {
+    status?: TaskStatus;
+    priority?: TaskPriority;
+  },
+): Task[] {
+  return tasks.filter((task) => {
     if (filter.status && task.status !== filter.status) return false;
     if (filter.priority && task.priority !== filter.priority) return false;
     return true;
   });
 }
-
-
 
 const tareas: Task[] = [
   {
@@ -151,7 +150,7 @@ const tareas: Task[] = [
     description: "Completar el módulo 6",
     status: "inProgress",
     priority: "high",
-    createdAt: new Date()
+    createdAt: new Date(),
   },
   {
     id: "2",
@@ -160,7 +159,7 @@ const tareas: Task[] = [
     status: "completed",
     priority: "medium",
     assigneeId: "user-1",
-    createdAt: new Date()
+    createdAt: new Date(),
   },
   {
     id: "3",
@@ -169,7 +168,7 @@ const tareas: Task[] = [
     status: "pending",
     priority: "critical",
     assigneeId: "user-2",
-    createdAt: new Date()
+    createdAt: new Date(),
   },
   {
     id: "4",
@@ -177,7 +176,7 @@ const tareas: Task[] = [
     description: "Sin asignación",
     status: "pending",
     priority: "low",
-    createdAt: new Date()
+    createdAt: new Date(),
   },
   {
     id: "5",
@@ -186,12 +185,14 @@ const tareas: Task[] = [
     status: "inProgress",
     priority: "medium",
     assigneeId: "user-1",
-    createdAt: new Date()
-  }
+    createdAt: new Date(),
+  },
 ];
 
-const listaf =  filterTasks(tareas,{status:"completed"})
+const listaf = filterTasks(tareas, { status: "completed" });
+console.log(listaf);
 
+const listaf = filterTasks(tareas, { status: "completed", priority: "high" });
 console.log(listaf);
 
 console.log(isAssigned(tareas[0]));
