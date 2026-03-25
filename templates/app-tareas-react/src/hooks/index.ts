@@ -1,3 +1,5 @@
 // ============================================
-// TaskCard Component - Anexo 3A
+// Barrel de hooks - Anexo 3A
 // ============================================
+
+export { useTask } from './useTask';

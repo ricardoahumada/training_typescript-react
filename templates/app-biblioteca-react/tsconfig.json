@@ -1,0 +1,47 @@
+{
+  "compilerOptions": {
+    // TODO: Configurar target
+    "target": "",
+    
+    // TODO: Configurar lib para incluir DOM
+    "lib": [],
+    
+    // TODO: Configurar module
+    "module": "",
+    
+    // TODO: Configurar moduleResolution
+    "moduleResolution": "",
+    
+    // TODO: Configurar jsx para React
+    "jsx": "",
+    
+    // TODO: Configurar strict
+    "strict": true,
+    
+    // TODO: Configurar esModuleInterop
+    "esModuleInterop": true,
+    
+    // TODO: Configurar skipLibCheck
+    "skipLibCheck": true,
+    
+    // TODO: Configurar forceConsistentCasingInFileNames
+    "forceConsistentCasingInFileNames": true,
+    
+    // TODO: Configurar resolveJsonModule
+    "resolveJsonModule": true,
+    
+    // TODO: Configurar isolatedModules
+    "isolatedModules": true,
+    
+    // TODO: Configurar noEmit
+    "noEmit": false,
+    
+    // TODO: Configurar outDir
+    "outDir": "./dist",
+    
+    // TODO: Configurar baseUrl
+    "baseUrl": "./src"
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}

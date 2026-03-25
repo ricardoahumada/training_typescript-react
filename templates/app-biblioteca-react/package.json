@@ -1,0 +1,27 @@
+{
+  "name": "@course/caso2r-plantilla",
+  "version": "1.0.0",
+  "description": "Caso 2r: Sistema de Biblioteca en React + Webpack",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "webpack serve --mode development",
+    "build": "webpack --mode production",
+    "start": "webpack serve --mode development --open",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": ["typescript", "react", "webpack", "curso", "caso2r"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "typescript": "^5.3.3"
+  },
+  "sideEffects": [
+    "*.css"
+  ]
+}
