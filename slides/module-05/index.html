@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Módulo 5: Variables y Tipado</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- Reveal.js 5.2 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.2.0/dist/reset.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.2.0/dist/reveal.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.2.0/dist/theme/white.css">
+    
+    <!-- Highlight.js para codigo -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.2.0/plugin/highlight/monokai.css">
+    
+    <!-- CSS Personalizado -->
+    <link rel="stylesheet" href="css/custom.css">
+</head>
+<body>
+    <div class="reveal">
+        <div class="slides">
+            
+            <!-- ======================= PORTADA ======================= -->
+            <section class="slide-title">
+                <img src="./imgs/axia_logo.png" class="logo" alt="">
+                <h1>Módulo 5</h1>
+                <h2>Variables y Tipado</h2>
+                <p class="small-text">Curso: TypeScript</p>
+                <div style="margin-top: 40px;">
+                    <span class="badge badge-primary">60 min</span>
+                </div>
+            </section>
+
+            <!-- ======================= OBJETIVOS ======================= -->
+            <section>
+                <h2>Objetivos de Aprendizaje</h2>
+                <ul>
+                    <li class="fragment">Dominar la declaración de variables con <strong>let, const y var</strong></li>
+                    <li class="fragment">Comprender la <strong>inferencia de tipos</strong> de TypeScript</li>
+                    <li class="fragment">Aplicar <strong>type annotations</strong> de manera efectiva</li>
+                    <li class="fragment">Utilizar <strong>tipos personalizados</strong> y aliases</li>
+                    <li class="fragment">Implementar <strong>type assertions</strong> de forma segura</li>
+                </ul>
+            </section>
+
+            <!-- ======================= SECCION 1: CONTEXTO ======================= -->
+            <section>
+                <section class="section-divider">
+                    <h1>1. Contexto</h1>
+                    <p>Declaraciones de Variables</p>
+                </section>
+
+                <section>
+                    <h2>let, const y var</h2>
+                    <p>TypeScript hereda las declaraciones de variables de JavaScript con verificación de tipos:</p>
+                    <pre><code class="language-typescript">// const - valor que no cambia (recomendado)
+const API_URL = "https://api.example.com";
+const MAX_RETRIES = 3;
+
+// let - valor que puede cambiar
+let currentUser: string = "Juan";
+currentUser = "María"; // OK
+
+// var - evítalo (function-scoped, no block-scoped)
+var oldStyle = "deprecated"; // No recomendado</code></pre>
+                    <div class="block-info">
+                        <p><strong>Best Practice:</strong> Usa <code>const</code> por defecto, usa <code>let</code> solo cuando necesites reasignar.</p>
+                    </div>
+                </section>
+            </section>
+
+            <!-- ======================= PÍLDORA → LAB ======================= -->
+            <section>
+                <section class="section-divider">
+                    <h1>2. Inferencia de Tipos</h1>
+                </section>
+
+                <!-- Píldora: Inferencia -->
+                <section>
+                    <h2>Inferencia de Tipos</h2>
+                    <p>TypeScript infiere el tipo automáticamente cuando no lo declaras explícitamente:</p>
+                    <pre><code class="language-typescript">// TypeScript infiere: string
+let name = "Juan"; 
+
+// TypeScript infiere: number
+let age = 30;
+
+// TypeScript infiere: string[]
+let tags = ["urgent", "work"];
+
+// TypeScript infiere: { name: string, age: number }
+let user = { name: "Ana", age: 25 };</code></pre>
+                </section>
+
+                <!-- Lab: Aplicar Tipado -->
+                <section>
+                    <h2>Lab: Aplicar Tipado al Sistema de Tareas</h2>
+                    <div class="block-info">
+                        <p><strong>Objetivo:</strong> Definir tipos personalizados y aplicar type annotations al Caso 1.</p>
+                    </div>
+                    <ol>
+                        <li class="fragment">Abre el archivo <code>src/types/index.ts</code></li>
+                        <li class="fragment">Crea un type alias para <code>TaskPriority</code></li>
+                        <li class="fragment">Crea un type alias para <code>TaskStatus</code></li>
+                        <li class="fragment">Define la interfaz <code>Task</code> con tipos explícitos</li>
+                        <li class="fragment">Usa type assertion para convertir datos sin tipo</li>
+                    </ol>
+                </section>
+
+                <!-- Código del Lab -->
+                <section>
+                    <h2>Código del Lab</h2>
+                    <pre><code class="language-typescript">// 1. Type aliases
+type TaskPriority = "low" | "medium" | "high";
+type TaskStatus = "pending" | "inProgress" | "completed";
+
+// 2. Interfaz Task
+interface Task {
+  id: string;
+  title: string;
+  description: string;
+  priority: TaskPriority;
+  status: TaskStatus;
+  assigneeId?: string;
+  completedAt?: Date;
+}
+
+// 3. Type assertion
+const rawData = { id: "1", title: "Nueva tarea" };
+const task: Task = rawData as Task;</code></pre>
+                </section>
+            </section>
+
+            <!-- ======================= SEGUNDA PÍLDORA → LAB ======================= -->
+            <section>
+                <section class="section-divider">
+                    <h1>3. Type Aliases y Unions</h1>
+                </section>
+
+                <!-- Píldora: Tipos Personalizados -->
+                <section>
+                    <h2>Tipos Personalizados</h2>
+                    <p>Los type aliases permiten crear nombres para tipos complejos:</p>
+                    <pre><code class="language-typescript">// Union de tipos
+type ID = string | number;
+
+type Priority = "low" | "medium" | "high";
+
+type Status = "active" | "inactive" | "pending";
+
+// Tipo con propiedades
+type User = {
+  id: ID;
+  name: string;
+  email: string;
+};
+
+// Intersection de tipos
+type Admin = User & { role: "admin" };</code></pre>
+                </section>
+
+                <!-- Lab: Tipos Avanzados -->
+                <section>
+                    <h2>Lab: Tipos Avanzados para el Sistema de Tareas</h2>
+                    <div class="block-info">
+                        <p><strong>Objetivo:</strong> Crear tipos personalizados que combinen union y intersection.</p>
+                    </div>
+                    <ol>
+                        <li class="fragment">Crea un tipo <code>SerializableTask</code> que convierta fechas a strings</li>
+                        <li class="fragment">Crea un tipo <code>UrgentTask</code> con urgencia</li>
+                        <li class="fragment">Crea un tipo <code>TaskFilter</code> para opciones de filtrado</li>
+                    </ol>
+                </section>
+
+                <!-- Código -->
+                <section>
+                    <h2>Código del Lab</h2>
+                    <pre><code class="language-typescript">// SerializableTask
+type SerializableTask = Omit&lt;Task, "completedAt"&gt; & {
+  completedAt?: string;
+};
+
+// UrgentTask
+type UrgentTask = Task & {
+  isUrgent: true;
+  urgencyReason: string;
+};
+
+// TaskFilter
+type TaskFilter = {
+  status?: TaskStatus;
+  priority?: TaskPriority;
+  assigneeId?: string;
+};</code></pre>
+                </section>
+            </section>
+
+            <!-- ======================= RESUMEN ======================= -->
+            <section>
+                <section class="section-divider">
+                    <h1>Resumen</h1>
+                </section>
+
+                <section>
+                    <h2>Puntos Clave</h2>
+                    <ul>
+                        <li class="fragment">Usa <code>const</code> por defecto, <code>let</code> solo cuando sea necesario</li>
+                        <li class="fragment">TypeScript infiere tipos automáticamente en la mayoría de casos</li>
+                        <li class="fragment">Usa annotation explícita para parámetros y retornos de funciones</li>
+                        <li class="fragment">Los type aliases crean nombres reutilizables para tipos complejos</li>
+                        <li class="fragment"><code>as</code> assertions permiten convertir tipos (úsalo con precaución)</li>
+                    </ul>
+                </section>
+            </section>
+
+            <!-- ======================= EJERCICIO INTEGRADOR ======================= -->
+            <section>
+                <section class="section-divider">
+                    <h1>Ejercicio Integrador</h1>
+                    <p>Sistema de Biblioteca</p>
+                </section>
+
+                <section>
+                    <h2>Caso 2: Biblioteca</h2>
+                    <div class="block-info">
+                        <p><strong>Objetivo:</strong> Extender el Caso 2 con tipos personalizados.</p>
+                    </div>
+                    <ol>
+                        <li class="fragment">Crea tipos para <code>MemberType</code> (standard, premium, student)</li>
+                        <li class="fragment">Crea un tipo <code>LoanFilter</code> con filtros opcionales</li>
+                        <li class="fragment">Crea un tipo <code>BookStats</code> que combine datos de préstamos</li>
+                    </ol>
+                    <p class="fragment"><strong>Trabajo en grupos de 2-4 personas.</strong></p>
+                </section>
+            </section>
+
+            <!-- ======================= TIPS Y GOTCHAS ======================= -->
+            <section>
+                <section class="section-divider">
+                    <h1>Tips y Gotchas</h1>
+                </section>
+
+                <section>
+                    <h2>✅ Tips</h2>
+                    <ul>
+                        <li class="fragment">Usa <code>const</code> por defecto; solo <code>let</code> si necesitas reasignar</li>
+                        <li class="fragment">Type inference funciona en el 90% de los casos</li>
+                        <li class="fragment">Annotation explícita: parámetros, retornos, variables antes de inicialización</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h2>⚠️ Gotchas</h2>
+                    <ul>
+                        <li class="fragment"><code>const</code> no hace inmutables los objetos - usa <code>readonly</code> o <code>as const</code></li>
+                        <li class="fragment">Type assertion (<code>as</code>) NO valida tipos en runtime</li>
+                        <li class="fragment"><code>type</code> vs <code>interface</code> - type es más flexible para unions</li>
+                    </ul>
+                </section>
+            </section>
+
+            <!-- ======================= REFERENCIAS ======================= -->
+            <section>
+                <section class="section-divider">
+                    <h1>Referencias</h1>
+                </section>
+
+                <section>
+                    <h2>Recursos Adicionales</h2>
+                    <ul>
+                        <li><a href="https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#type-aliases" target="_blank">TypeScript Type Aliases</a></li>
+                        <li><a href="https://www.typescriptlang.org/docs/handbook/2/everyday-types.html" target="_blank">TypeScript Inference</a></li>
+                        <li><a href="https://www.typescriptlang.org/docs/handbook/utility-types.html" target="_blank">TypeScript Utility Types</a></li>
+                    </ul>
+                </section>
+            </section>
+
+            <!-- ======================= GRACIAS ======================= -->
+            <section class="slide-title">
+                <img src="./imgs/axia_logo.png" class="logo" alt="">
+                <h1>Gracias!</h1>
+                <h2>Módulo 5 Completado</h2>
+                <p class="small-text">Siguiente: Módulo 6 - Estructuras de Control</p>
+            </section>
+
+        </div>
+    </div>
+
+    <!-- Reveal.js Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.2.0/dist/reveal.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.2.0/plugin/highlight/highlight.js"></script>
+    <script>
+        Reveal.initialize({
+            hash: true,
+            slideNumber: true,
+            pdfSeparateFragments: false, 
+            plugins: [ RevealHighlight ]
+        });
+    </script>
+</body>
+</html>

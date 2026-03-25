@@ -64,6 +64,22 @@ export interface Loan {
   status: LoanStatus;
 }
 
-// Tipos auxiliares para creación (parciales)
-export type BookInput = Partial<Book>;
-export type MemberInput = Partial<Member>;
+// Interfaces parciales para creación (sin usar Partial<T>)
+export interface BookInput {
+  isbn?: string;
+  title?: string;
+  authors?: string[];
+  genre?: Genre;
+  publicationYear?: number;
+  publisher?: string;
+  availableCopies?: number;
+  totalCopies?: number;
+  isDigital?: boolean;
+}
+
+export interface MemberInput {
+  name?: string;
+  email?: string;
+  phone?: string;
+  membershipType?: MembershipType;
+}

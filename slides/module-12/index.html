@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Módulo 12: Testing con TypeScript</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- Reveal.js 5.2 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.2.0/dist/reset.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.2.0/dist/reveal.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.2.0/dist/theme/white.css">
+    
+    <!-- Highlight.js para codigo -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.2.0/plugin/highlight/monokai.css">
+    
+    <!-- CSS Personalizado -->
+    <link rel="stylesheet" href="css/custom.css">
+</head>
+<body>
+    <div class="reveal">
+        <div class="slides">
+            
+            <!-- ======================= PORTADA ======================= -->
+            <section class="slide-title">
+                <img src="./imgs/axia_logo.png" class="logo" alt="">
+                <h1>Módulo 12</h1>
+                <h2>Testing con TypeScript</h2>
+                <p class="small-text">Curso: TypeScript</p>
+                <div style="margin-top: 40px;">
+                    <span class="badge badge-primary">120 min</span>
+                </div>
+            </section>
+
+            <!-- ======================= OBJETIVOS ======================= -->
+            <section>
+                <h2>Objetivos de Aprendizaje</h2>
+                <ul>
+                    <li class="fragment">Configurar <strong>Jest</strong> para TypeScript</li>
+                    <li class="fragment">Escribir <strong>tests unitarios</strong> con tipos</li>
+                    <li class="fragment">Crear <strong>mocks tipados</strong></li>
+                    <li class="fragment">Implementar <strong>tests de integración</strong></li>
+                    <li class="fragment">Medir <strong>coverage</strong> de código</li>
+                </ul>
+            </section>
+
+            <!-- ======================= SECCION 1: CONTEXTO ======================= -->
+            <section>
+                <section class="section-divider">
+                    <h1>1. Contexto</h1>
+                    <p>Testing en TypeScript</p>
+                </section>
+
+                <section>
+                    <h2>Por qué Testing con Tipos</h2>
+                    <p>TypeScript mejora el testing:</p>
+                    <pre><code class="language-typescript">// Jest con tipos
+test("should create task", () => {
+  const task = createTask("Test task", "high");
+  
+  // TypeScript sabe el tipo de task
+  expect(task.title).toBe("Test task");
+  expect(task.priority).toBe("high");
+});</code></pre>
+                    <div class="block-info">
+                        <p>El autocompletado y la verificación de tipos hacen que los tests sean más confiables.</p>
+                    </div>
+                </section>
+            </section>
+
+            <!-- ======================= PÍLDORA → LAB ======================= -->
+            <section>
+                <section class="section-divider">
+                    <h1>2. Configuración</h1>
+                </section>
+
+                <!-- Píldora -->
+                <section>
+                    <h2>Jest con TypeScript</h2>
+                    <p class="fragment">ts-jest permite ejecutar tests TypeScript con Jest.</p>
+                    <pre><code class="language-bash">npm install -D jest ts-jest @types/jest</code></pre>
+                    <pre><code class="language-javascript">// jest.config.ts
+export default {
+  preset: "ts-jest",
+  testEnvironment: "node",
+  roots: ["&lt;rootDir&gt;/src", "&lt;rootDir&gt;/tests"],
+  moduleNameMapper: {
+    "^@/(.*)$": "&lt;rootDir&gt;/src/$1"
+  }
+};</code></pre>
+                </section>
+
+                <!-- Lab -->
+                <section>
+                    <h2>Lab: Configurar Testing</h2>
+                    <div class="block-info">
+                        <p><strong>Objetivo:</strong> Configurar Jest para el proyecto.</p>
+                    </div>
+                    <ol>
+                        <li class="fragment">Instala dependencias</li>
+                        <li class="fragment">Crea <code>jest.config.js</code></li>
+                        <li class="fragment">Añade scripts a <code>package.json</code></li>
+                        <li class="fragment">Verifica configuración</li>
+                    </ol>
+                </section>
+            </section>
+
+            <!-- ======================= SEGUNDA PÍLDORA → LAB ======================= -->
+            <section>
+                <section class="section-divider">
+                    <h1>3. Tests Unitarios</h1>
+                </section>
+
+                <!-- Píldora -->
+                <section>
+                    <h2>Escribiendo Tests</h2>
+                    <p class="fragment">Los tests unitarios prueban funciones de forma aislada.</p>
+                    <pre><code class="language-typescript">// src/utils/calculator.ts
+export function add(a: number, b: number): number {
+  return a + b;
+}
+
+// tests/calculator.test.ts
+import { add } from "../src/utils/calculator";
+
+describe("Calculator", () => {
+  test("adds two numbers", () => {
+    expect(add(2, 3)).toBe(5);
+  });
+  
+  test("handles negative numbers", () => {
+    expect(add(-1, -2)).toBe(-3);
+  });
+});</code></pre>
+                </section>
+
+                <!-- Lab -->
+                <section>
+                    <h2>Lab: Tests del Sistema de Tareas</h2>
+                    <div class="block-info">
+                        <p><strong>Objetivo:</strong> Escribir tests unitarios para el servicio de tareas.</p>
+                    </div>
+                    <ol>
+                        <li class="fragment">Crea test para <code>createTask</code></li>
+                        <li class="fragment">Crea test para <code>getAll</code></li>
+                        <li class="fragment">Crea test para filtrado</li>
+                    </ol>
+                </section>
+
+                <!-- Código Lab -->
+                <section>
+                    <h2>Código del Lab</h2>
+                    <pre><code class="language-typescript">// tests/taskService.test.ts
+import { TaskService } from "../src/services/taskService";
+
+describe("TaskService", () => {
+  let service: TaskService;
+  
+  beforeEach(() => {
+    service = new TaskService();
+  });
+  
+  describe("createTask", () => {
+    it("should create a task with given title", () => {
+      const task = service.createTask("New task", "high");
+      
+      expect(task.title).toBe("New task");
+      expect(task.priority).toBe("high");
+      expect(task.status).toBe("pending");
+    });
+    
+    it("should generate unique id", () => {
+      const task1 = service.createTask("Task 1", "low");
+      const task2 = service.createTask("Task 2", "low");
+      
+      expect(task1.id).not.toBe(task2.id);
+    });
+  });
+});</code></pre>
+                </section>
+            </section>
+
+            <!-- ======================= TERCERA PÍLDORA → LAB ======================= -->
+            <section>
+                <section class="section-divider">
+                    <h1>4. Mocks Tipados</h1>
+                </section>
+
+                <!-- Píldora -->
+                <section>
+                    <h2>Mocks con Tipo</h2>
+                    <p class="fragment">Los mocks tipados facilitan testing de servicios dependientes.</p>
+                    <pre><code class="language-typescript">// Mock de repositorio
+const mockTaskRepository = {
+  findAll: jest.fn(),
+  findById: jest.fn(),
+  save: jest.fn(),
+  delete: jest.fn()
+} as jest.Mocked&lt;ITaskRepository&gt;;
+
+// Mock con implementación
+const mockDate = new Date("2024-01-01");
+jest.spyOn(global, "Date").mockImplementation(() => mockDate);</code></pre>
+                </section>
+
+                <!-- Lab -->
+                <section>
+                    <h2>Lab: Mocks para el Sistema de Tareas</h2>
+                    <div class="block-info">
+                        <p><strong>Objetivo:</strong> Crear mocks tipados para el servicio.</p>
+                    </div>
+                    <ol>
+                        <li class="fragment">Crea mock para el repositorio</li>
+                        <li class="fragment">Mockea funciones externas</li>
+                        <li class="fragment">Verifica llamadas con tipos</li>
+                    </ol>
+                </section>
+            </section>
+
+            <!-- ======================= 4bis. SPYON Y THROW ======================= -->
+            <section>
+                <section class="section-divider">
+                    <h1>5. SpyOn y toThrow</h1>
+                </section>
+
+                <!-- Píldora -->
+                <section>
+                    <h2>SpyOn</h2>
+                    <p class="fragment">Permite espiar métodos específicos de un objeto sin reemplazar toda la implementación.</p>
+                    <pre><code class="language-typescript">const consoleSpy = vi.spyOn(console, "log");
+
+console.log("test");
+expect(consoleSpy).toHaveBeenCalledWith("test");
+
+consoleSpy.mockRestore();</code></pre>
+                </section>
+
+                <!-- Píldora -->
+                <section>
+                    <h2>toThrow</h2>
+                    <p class="fragment">Verifica que una función lance un error.</p>
+                    <pre><code class="language-typescript">function validateAge(age: number): void {
+  if (age < 0) {
+    throw new Error("Age cannot be negative");
+  }
+}
+
+test("throws error for negative age", () => {
+  expect(() => validateAge(-1)).toThrow("Age cannot be negative");
+});</code></pre>
+                </section>
+
+                <!-- Lab -->
+                <section>
+                    <h2>Lab: Tests de Error y Spies</h2>
+                    <div class="block-info">
+                        <p><strong>Objetivo:</strong> Implementar tests con spies y verificación de errores.</p>
+                    </div>
+                    <ol>
+                        <li class="fragment">Usa <code>vi.spyOn</code> para espiar llamadas</li>
+                        <li class="fragment">Usa <code>toThrow</code> para verificar errores</li>
+                    </ol>
+                </section>
+            </section>
+
+            <!-- ======================= RESUMEN ======================= -->
+            <section>
+                <section class="section-divider">
+                    <h1>Resumen</h1>
+                </section>
+
+                <section>
+                    <h2>Puntos Clave</h2>
+                    <ul>
+                        <li class="fragment"><strong>ts-jest</strong> permite ejecutar tests TypeScript</li>
+                        <li class="fragment>Los <strong>tests con tipos</strong> son más confiables</li>
+                        <li class="fragment"><strong>jest.fn()</strong> crea funciones mock</li>
+                        <li class="fragment><strong>jest.spyOn()</strong> espía funciones existentes</li>
+                        <li class="fragment"><strong>--coverage</strong> mide la cobertura de código</li>
+                    </ul>
+                </section>
+            </section>
+
+            <!-- ======================= EJERCICIO INTEGRADOR ======================= -->
+            <section>
+                <section class="section-divider">
+                    <h1>Ejercicio Integrador</h1>
+                    <p>Sistema de Biblioteca</p>
+                </section>
+
+                <section>
+                    <h2>Caso 2: Biblioteca</h2>
+                    <div class="block-info">
+                        <p><strong>Objetivo:</strong> Escribir tests para el sistema de biblioteca.</p>
+                    </div>
+                    <ol>
+                        <li class="fragment">Configura Jest para el proyecto</li>
+                        <li class="fragment">Escribe tests para servicios</li>
+                        <li class="fragment">Mide coverage</li>
+                    </ol>
+                    <p class="fragment"><strong>Trabajo en grupos de 2-4 personas.</strong></p>
+                </section>
+            </section>
+
+            <!-- ======================= TIPS Y GOTCHAS ======================= -->
+            <section>
+                <section class="section-divider">
+                    <h1>Tips y Gotchas</h1>
+                </section>
+
+                <section>
+                    <h2>✅ Tips</h2>
+                    <ul>
+                        <li class="fragment">Arrange-Act-Assert (AAA) estructura tests claros</li>
+                        <li class="fragment">Tests unitarios: prueba una cosa, un assertion</li>
+                        <li class="fragment">Mocks tipados con <code>vi.fn()</code> y <code>vi.mock()</code></li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h2>⚠️ Gotchas</h2>
+                    <ul>
+                        <li class="fragment"><code>any</code> en mocks defeatiendo el propósito - tipa correctamente</li>
+                        <li class="fragment">Tests asíncronos necesitan <code>async/await</code></li>
+                        <li class="fragment">Coverage no garantiza tests correctos, solo cantidad</li>
+                    </ul>
+                </section>
+            </section>
+
+            <!-- ======================= REFERENCIAS ======================= -->
+            <section>
+                <section class="section-divider">
+                    <h1>Referencias</h1>
+                </section>
+
+                <section>
+                    <h2>Recursos Adicionales</h2>
+                    <ul>
+                        <li><a href="https://jestjs.io/docs/getting-started" target="_blank">Jest Documentation</a></li>
+                        <li><a href="https://jestjs.io/docs/mock-functions" target="_blank">Mock Functions</a></li>
+                    </ul>
+                </section>
+            </section>
+
+            <!-- ======================= GRACIAS ======================= -->
+            <section class="slide-title">
+                <img src="./imgs/axia_logo.png" class="logo" alt="">
+                <h1>Gracias!</h1>
+                <h2>Módulo 12 Completado</h2>
+                <p class="small-text">Siguiente: Anexo 3A - Webpack + React</p>
+            </section>
+
+        </div>
+    </div>
+
+    <!-- Reveal.js Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.2.0/dist/reveal.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.2.0/plugin/highlight/highlight.js"></script>
+    <script>
+        Reveal.initialize({
+            hash: true,
+            slideNumber: true,
+            pdfSeparateFragments: false, 
+            plugins: [ RevealHighlight ]
+        });
+    </script>
+</body>
+</html>

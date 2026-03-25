@@ -6,17 +6,17 @@ import { Book, Member, MembershipType, Genre, BookInput, MemberInput } from "../
 import { isValidISBN, isValidEmail, isValidPhone } from "../utils/validators";
 
 // Duración de préstamos por tipo de membresía (en días)
-const LOAN_DURATION: Record<MembershipType, number> = {
-  [MembershipType.STANDARD]: 14,
-  [MembershipType.PREMIUM]: 30,
-  [MembershipType.STUDENT]: 21
+const LOAN_DURATION = {
+  STANDARD: 14,
+  PREMIUM: 30,
+  STUDENT: 21
 };
 
 // Límite de préstamos por tipo de membresía
-const MAX_LOANS_BY_MEMBERSHIP: Record<MembershipType, number> = {
-  [MembershipType.STANDARD]: 3,
-  [MembershipType.PREMIUM]: 10,
-  [MembershipType.STUDENT]: 5
+const MAX_LOANS_BY_MEMBERSHIP = {
+  STANDARD: 3,
+  PREMIUM: 10,
+  STUDENT: 5
 };
 
 /**

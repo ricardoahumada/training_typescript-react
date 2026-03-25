@@ -1,0 +1,683 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Módulo 9: Genéricos</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Lato:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Reveal.js 5.2 CSS -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/reveal.js@5.2.0/dist/reset.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/reveal.js@5.2.0/dist/reveal.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/reveal.js@5.2.0/dist/theme/white.css"
+    />
+
+    <!-- Highlight.js para codigo -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/reveal.js@5.2.0/plugin/highlight/monokai.css"
+    />
+
+    <!-- CSS Personalizado -->
+    <link rel="stylesheet" href="css/custom.css" />
+  </head>
+  <body>
+    <div class="reveal">
+      <div class="slides">
+        <!-- ======================= PORTADA ======================= -->
+        <section class="slide-title">
+          <img src="./imgs/axia_logo.png" class="logo" alt="" />
+          <h1>Módulo 9</h1>
+          <h2>Genéricos</h2>
+          <p class="small-text">Curso: TypeScript</p>
+          <div style="margin-top: 40px">
+            <span class="badge badge-primary">90 min</span>
+          </div>
+        </section>
+
+        <!-- ======================= OBJETIVOS ======================= -->
+        <section>
+          <h2>Objetivos de Aprendizaje</h2>
+          <ul>
+            <li class="fragment">
+              Comprender el concepto de <strong>genéricos</strong>
+            </li>
+            <li class="fragment">
+              Crear <strong>funciones genéricas</strong> reutilizables
+            </li>
+            <li class="fragment">
+              Implementar <strong>clases e interfaces</strong> genéricas
+            </li>
+            <li class="fragment">
+              Aplicar <strong>restricciones</strong> a genéricos
+            </li>
+            <li class="fragment">
+              Utilizar genéricos <strong>built-in</strong> de TypeScript
+            </li>
+          </ul>
+        </section>
+
+        <!-- ======================= SECCION 1: CONTEXTO ======================= -->
+        <section>
+          <section class="section-divider">
+            <h1>1. Contexto</h1>
+            <p>Reutilización de Código</p>
+          </section>
+
+          <section>
+            <h2>El Problema</h2>
+            <p>Sin genéricos, necesitamos repetir código:</p>
+            <pre><code class="language-typescript">// Versión para strings
+function identityString(value: string): string {
+  return value;
+}
+
+// Versión para números
+function identityNumber(value: number): number {
+  return value;
+}
+
+// Versión para booleanos
+function identityBoolean(value: boolean): boolean {
+  return value;
+}</code></pre>
+          </section>
+
+          <section>
+            <h2>La Solución: Genéricos</h2>
+            <pre><code class="language-typescript">function identity&lt;T&gt;(value: T): T {
+  return value;
+}
+
+identity&lt;string&gt;("hello");
+identity&lt;number&gt;(42);
+identity(true); // TypeScript infiere el tipo</code></pre>
+          </section>
+        </section>
+
+        <!-- ======================= PÍLDORA → LAB ======================= -->
+        <section>
+          <section class="section-divider">
+            <h1>2. Funciones Genéricas</h1>
+          </section>
+
+          <!-- Píldora -->
+          <section>
+            <h2>Generic Functions</h2>
+            <p class="fragment">Las funciones genéricas trabajan con cualquier tipo manteniendo la seguridad tipográfica.</p>
+            <pre><code class="language-typescript">// Función genérica básica
+function firstElement&lt;T&gt;(arr: T[]): T | undefined {
+  return arr[0];
+}
+
+// Múltiples tipos genéricos
+function pair&lt;K, V&gt;(key: K, value: V): [K, V] {
+  return [key, value];
+}
+
+// Restricciones con extends
+function getProperty&lt;T, K extends keyof T&gt;(obj: T, key: K): T[K] {
+  return obj[key];
+}</code></pre>
+          </section>
+
+          <!-- Lab -->
+          <section>
+            <h2>Lab: Utilidades Genéricas para Tareas</h2>
+            <div class="block-info">
+              <p>
+                <strong>Objetivo:</strong> Crear funciones genéricas
+                reutilizables.
+              </p>
+            </div>
+            <ol>
+              <li class="fragment">Implementa <code>wrapInArray</code></li>
+              <li class="fragment">Implementa <code>mapArray</code></li>
+              <li class="fragment">Implementa <code>filterByProperty</code></li>
+              <li class="fragment">Implementa <code>sortByProperty</code></li>
+            </ol>
+          </section>
+
+          <!-- Código Lab -->
+          <section>
+            <h2>Código del Lab</h2>
+            <pre><code class="language-typescript">function wrapInArray&lt;T&gt;(value: T): T[] {
+  return [value];
+}
+
+function mapArray&lt;T, U&gt;(arr: T[], fn: (item: T) => U): U[] {
+  return arr.map(fn);
+}
+
+function filterByProperty&lt;T, K extends keyof T&gt;(
+  arr: T[],
+  key: K,
+  value: T[K]
+): T[] {
+  return arr.filter(item => item[key] === value);
+}
+
+function sortByProperty&lt;T, K extends keyof T&gt;(
+  arr: T[],
+  key: K,
+  direction: "asc" | "desc" = "asc"
+): T[] {
+  return [...arr].sort((a, b) => {
+    const aVal = a[key];
+    const bVal = b[key];
+    if (aVal < bVal) return direction === "asc" ? -1 : 1;
+    if (aVal > bVal) return direction === "asc" ? 1 : -1;
+    return 0;
+  });
+}</code></pre>
+          </section>
+        </section>
+
+        <!-- ======================= SEGUNDA PÍLDORA → LAB ======================= -->
+        <section>
+          <section class="section-divider">
+            <h1>3. Clases Genéricas</h1>
+          </section>
+
+          <!-- Píldora -->
+          <section>
+            <h2>Generic Classes</h2>
+            <p class="fragment">Las clases genéricas permiten crear componentes reutilizables que trabajan con cualquier tipo.</p>
+            <pre><code class="language-typescript">// Repository genérico
+class Repository&lt;T&gt; {
+  private items: T[] = [];
+  
+  add(item: T): void {
+    this.items.push(item);
+  }
+  
+  getAll(): T[] {
+    return [...this.items];
+  }
+  
+  find(predicate: (item: T) => boolean): T[] {
+    return this.items.filter(predicate);
+  }
+}
+
+const taskRepo = new Repository&lt;Task&gt;();
+const userRepo = new Repository&lt;User&gt;();</code></pre>
+          </section>
+
+          <!-- Lab -->
+          <section>
+            <h2>Lab: Repository Genérico para Tareas</h2>
+            <div class="block-info">
+              <p>
+                <strong>Objetivo:</strong> Implementar un repositorio genérico.
+              </p>
+            </div>
+            <ol>
+              <li class="fragment">
+                Crea la clase <code>TaskRepository</code>
+              </li>
+              <li class="fragment">Implementa métodos CRUD</li>
+              <li class="fragment">Añade métodos de búsqueda</li>
+            </ol>
+          </section>
+        </section>
+
+        <!-- ======================= CUARTA PÍLDORA → LAB ======================= -->
+        <section>
+          <section class="section-divider">
+            <h1>4. Restricciones (Constraints)</h1>
+          </section>
+
+          <!-- Píldora -->
+          <section>
+            <h2>Constraints con extends</h2>
+            <p>Las restricciones limitan los tipos permitidos:</p>
+            <pre><code class="language-typescript">// Requiere que T tenga id
+interface Identifiable {
+  id: string;
+}
+
+function findById&lt;T extends Identifiable&gt;(
+  items: T[], 
+  id: string
+): T | undefined {
+  return items.find(item => item.id === id);
+}
+
+// Múltiples restricciones
+function createPair&lt;K extends string, V extends { toString(): string }&gt;(
+  key: K,
+  value: V
+): { key: K; value: string } {
+  return { key, value: value.toString() };
+}</code></pre>
+          </section>
+
+          <!-- Lab -->
+          <section>
+            <h2>Lab: Sistema de Filtrado Genérico</h2>
+            <div class="block-info">
+              <p>
+                <strong>Objetivo:</strong> Crear filtros genéricos con
+                restricciones.
+              </p>
+            </div>
+            <ol>
+              <li class="fragment">
+                Define interfaz base <code>Filterable</code>
+              </li>
+              <li class="fragment">
+                Implementa filtro genérico con <code>extends</code>
+              </li>
+              <li class="fragment">Añade múltiples criterios de filtrado</li>
+            </ol>
+            <pre><code class="language-typescript">interface Filterable {
+  status?: TaskStatus;
+  priority?: TaskPriority;
+}
+
+class TaskFilter&lt;T extends Filterable&gt; {
+  filter(items: T[], criteria: Partial&lt;T&gt;): T[] {
+    return items.filter(item => {
+      for (const key in criteria) {
+        if (criteria[key] !== undefined && 
+            item[key] !== criteria[key]) {
+          return false;
+        }
+      }
+      return true;
+    });
+  }
+}</code></pre>
+          </section>
+        </section>
+
+        <!-- ======================= CONDITIONAL TYPES ======================= -->
+        <section>
+          <section class="section-divider">
+            <h1>5. Conditional Types</h1>
+          </section>
+
+          <!-- Conditional Type Basics -->
+          <section>
+            <h2>Conditional Type Basics</h2>
+            <p>
+              Los <strong>conditional types</strong> permiten crear tipos que
+              dependen de otros tipos:
+            </p>
+            <pre><code class="language-typescript">// Sintaxis: T extends U ? X : Y
+// Si T es asignable a U, el tipo es X, si no, es Y
+
+type IsString&lt;T&gt; = T extends string ? "yes" : "no";
+
+type A = IsString&lt;string&gt;;  // "yes"
+type B = IsString&lt;number&gt;;  // "no"</code></pre>
+          </section>
+
+          <section>
+            <h2>Ejemplo: ElementType</h2>
+            <p>Extraer el tipo de elemento de un array:</p>
+            <pre><code class="language-typescript">type ElementType&lt;T&gt; = T extends Array&lt;infer Item&gt; ? Item : never;
+
+type C = ElementType&lt;string[]&gt;;  // string
+type D = ElementType&lt;number[]&gt;;  // number
+type E = ElementType&lt;boolean&gt;;   // never</code></pre>
+          </section>
+
+          <!-- infer Keyword -->
+          <section>
+            <h2>Keyword: infer</h2>
+            <p>
+              <code>infer</code> permite extraer tipos dentro de conditional
+              types:
+            </p>
+            <pre><code class="language-typescript">// Extraer tipo de retorno de una función
+type ReturnType&lt;T&gt; = T extends (...args: any[]) => infer R ? R : never;
+
+function getTask() {
+  return { id: "1", title: "Test" };
+}
+
+type TaskReturn = ReturnType&lt;typeof getTask&gt;;
+// { id: string; title: string }</code></pre>
+          </section>
+
+          <section>
+            <h2>infer: Extraer Argumentos</h2>
+            <pre><code class="language-typescript">// Extraer primer argumento de una función
+type FirstArg&lt;T&gt; = T extends (first: infer F, ...rest: any[]) => any ? F : never;
+
+function createTask(title: string, priority: number) {}
+
+type TitleArg = FirstArg&lt;typeof createTask&gt;;  // string</code></pre>
+          </section>
+
+          <!-- Distributive Conditional Types -->
+          <section>
+            <h2>Distributive Conditional Types</h2>
+            <p>Los conditional types se distribuyen sobre tipos unión:</p>
+            <pre><code class="language-typescript">type ToArray&lt;T&gt; = T extends any ? T[] : never;
+
+type StringOrNumberArray = ToArray&lt;string | number&gt;;
+// Equivale a: ToArray&lt;string&gt; | ToArray&lt;number&gt;
+// Resultado: string[] | number[]</code></pre>
+          </section>
+
+          <section>
+            <h2>Ejemplo: Exclude</h2>
+            <p>Filter con conditional types:</p>
+            <pre><code class="language-typescript">type Exclude&lt;T, U&gt; = T extends U ? never : T;
+
+type Status = "pending" | "inProgress" | "completed" | "blocked";
+type ActiveStatus = Exclude&lt;Status, "completed" | "blocked"&gt;;
+// "pending" | "inProgress"</code></pre>
+          </section>
+
+          <!-- Lab -->
+          <section>
+            <h2>Lab: Conditional Types</h2>
+            <div class="block-info">
+              <p>
+                <strong>Objetivo:</strong> Crear utility types personalizados
+                usando conditional types.
+              </p>
+            </div>
+            <ol>
+              <li class="fragment">Implementa <code>UnwrapPromise</code></li>
+              <li class="fragment">
+                Implementa <code>ExtractArrayElement</code>
+              </li>
+              <li class="fragment">Implementa <code>Nullable</code></li>
+            </ol>
+          </section>
+
+          <section>
+            <h2>Código del Lab</h2>
+            <pre><code class="language-typescript">// 1. UnwrapPromise
+type UnwrapPromise&lt;T&gt; = T extends Promise&lt;infer R&gt; ? R : T;
+type A = UnwrapPromise&lt;Promise&lt;string&gt;&gt;;  // string
+type B = UnwrapPromise&lt;number&gt;;             // number
+
+// 2. ExtractArrayElement
+type ExtractArrayElement&lt;T&gt; = T extends Array&lt;infer E&gt; ? E : T;
+type C = ExtractArrayElement&lt;string[]&gt;;  // string
+
+// 3. Nullable
+type Nullable&lt;T&gt; = T | null | undefined;
+type E = Nullable&lt;string&gt;;  // string | null | undefined</code></pre>
+          </section>
+        </section>
+
+        <!-- ======================= 5bis. UTILITY TYPES ======================= -->
+        <section>
+          <section class="section-divider">
+            <h1>6. Utility Types</h1>
+          </section>
+
+          <!-- Píldora -->
+          <section>
+            <h2>Partial, Required, Readonly</h2>
+            <p class="fragment">
+              Transforma tipos: opcionales, requeridos, solo lectura.
+            </p>
+            <pre><code class="language-typescript">interface User {
+  id: string;
+  name: string;
+  email: string;
+}
+
+type UserUpdate = Partial&lt;User&gt;;
+type UserComplete = Required&lt;User&gt;;
+type UserView = Readonly&lt;User&gt;;
+</code></pre>
+          </section>
+
+          <!-- Píldora -->
+          <section>
+            <h2>Pick, Omit, Record</h2>
+            <p class="fragment">
+              Selecciona, excluye propiedades o crea tipos con claves
+              específicas.
+            </p>
+            <pre><code class="language-typescript">type UserPreview = Pick&lt;User, "id" | "name"&gt;;
+type UserWithoutEmail = Omit&lt;User, "email"&gt;;
+
+type UserRole = "admin" | "user" | "guest";
+type RolePermissions = Record&lt;UserRole, string[]&gt;;
+</code></pre>
+          </section>
+
+          <!-- Píldora -->
+          <section>
+            <h2>Exclude, Extract, NonNullable</h2>
+            <p class="fragment">Filtra tipos de unión o elimina nulos.</p>
+            <pre><code class="language-typescript">type Status = "pending" | "inProgress" | "completed" | null;
+
+type ActiveStatus = Exclude&lt;Status, "completed"&gt;;
+type ProcessingStatus = Extract&lt;Status, "pending" | "inProgress"&gt;;
+type NonNullStatus = NonNullable&lt;Status&gt;;
+</code></pre>
+          </section>
+
+          <!-- Píldora -->
+          <section>
+            <h2>ReturnType y Parameters</h2>
+            <p class="fragment">
+              Extrae el tipo de retorno o parámetros de una función.
+            </p>
+            <pre><code class="language-typescript">function createTask(title: string): Task {
+  return { id: "1", title, status: "pending" };
+}
+
+type TaskReturn = ReturnType&lt;typeof createTask&gt;;
+type TaskParams = Parameters&lt;typeof createTask&gt;;
+</code></pre>
+          </section>
+
+          <!-- Lab -->
+          <section>
+            <h2>Lab: Utility Types en la Biblioteca</h2>
+            <div class="block-info">
+              <p>
+                <strong>Objetivo:</strong> Aplicar utility types para crear
+                variantes de tipos.
+              </p>
+            </div>
+            <ol>
+              <li class="fragment">
+                Crea <code>BookUpdate</code> con
+                <code>Partial&lt;Book&gt;</code>
+              </li>
+              <li class="fragment">
+                Crea <code>BookPreview</code> con <code>Pick</code>
+              </li>
+              <li class="fragment">
+                Crea <code>MemberStats</code> con <code>Record</code>
+              </li>
+              <li class="fragment">
+                Usa <code>ReturnType</code> para obtener tipo de función
+              </li>
+            </ol>
+          </section>
+
+          <!-- Código Lab -->
+          <section>
+            <h2>Código del Lab</h2>
+            <pre><code class="language-typescript">type BookUpdate = Partial&lt;Book&gt;;
+type BookPreview = Pick&lt;Book, "title" | "author"&gt;;
+
+type MemberRole = "standard" | "premium" | "admin";
+type MemberStats = Record&lt;MemberRole, { count: number }&gt;;
+
+function getLoanStatus(loan: Loan): "active" | "returned" {
+  return loan.returned ? "returned" : "active";
+}
+
+type LoanStatus = ReturnType&lt;typeof getLoanStatus&gt;;
+</code></pre>
+          </section>
+        </section>
+
+        <!-- ======================= RESUMEN ======================= -->
+        <section>
+          <section class="section-divider">
+            <h1>Resumen</h1>
+          </section>
+
+          <section>
+            <h2>Puntos Clave</h2>
+            <ul>
+              <li class="fragment">
+                Los <strong>genéricos</strong> permiten crear código
+                reutilizable con tipos variables
+              </li>
+              <li class="fragment">
+                <code>&lt;T&gt;</code> define un parámetro de tipo
+              </li>
+              <li class="fragment">
+                <strong>Restricciones</strong> con <code>extends</code> limitan
+                los tipos permitidos
+              </li>
+              <li class="fragment">
+                TypeScript infiere el tipo en la mayoría de casos
+              </li>
+              <li class="fragment">
+                <strong>Utility types</strong> como <code>Partial</code>,
+                <code>Required</code>, <code>Pick</code>
+              </li>
+            </ul>
+          </section>
+        </section>
+
+        <!-- ======================= EJERCICIO INTEGRADOR ======================= -->
+        <section>
+          <section class="section-divider">
+            <h1>Ejercicio Integrador</h1>
+            <p>Sistema de Biblioteca</p>
+          </section>
+
+          <section>
+            <h2>Caso 2: Biblioteca</h2>
+            <div class="block-info">
+              <p>
+                <strong>Objetivo:</strong> Aplicar genéricos al sistema de
+                biblioteca.
+              </p>
+            </div>
+            <ol>
+              <li class="fragment">
+                Crea un repositorio genérico para libros y miembros
+              </li>
+              <li class="fragment">Implementa filtros genéricos</li>
+              <li class="fragment">Crea utility types para el dominio</li>
+            </ol>
+            <p class="fragment">
+              <strong>Trabajo en grupos de 2-4 personas.</strong>
+            </p>
+          </section>
+        </section>
+
+        <!-- ======================= TIPS Y GOTCHAS ======================= -->
+        <section>
+          <section class="section-divider">
+            <h1>Tips y Gotchas</h1>
+          </section>
+
+          <section>
+            <h2>✅ Tips</h2>
+            <ul>
+              <li class="fragment">
+                Genéricos permiten código reusable manteniendo tipos
+              </li>
+              <li class="fragment">
+                Usa <code>extends</code> para constraints
+              </li>
+              <li class="fragment">
+                Utility types: <code>Partial&lt;T&gt;</code>,
+                <code>Pick&lt;T,K&gt;</code>, <code>Omit&lt;T,K&gt;</code>
+              </li>
+            </ul>
+          </section>
+
+          <section>
+            <h2>⚠️ Gotchas</h2>
+            <ul>
+              <li class="fragment">
+                <code>Array&lt;T&gt;</code> vs <code>T[]</code> son equivalentes
+              </li>
+              <li class="fragment">
+                Constraint <code>extends</code> no es herencia
+              </li>
+              <li class="fragment">
+                No abuses de <code>any</code> genérico - especifica constraints
+              </li>
+            </ul>
+          </section>
+        </section>
+
+        <!-- ======================= REFERENCIAS ======================= -->
+        <section>
+          <section class="section-divider">
+            <h1>Referencias</h1>
+          </section>
+
+          <section>
+            <h2>Recursos Adicionales</h2>
+            <ul>
+              <li>
+                <a
+                  href="https://www.typescriptlang.org/docs/handbook/2/generics.html"
+                  target="_blank"
+                  >Generics</a
+                >
+              </li>
+              <li>
+                <a
+                  href="https://www.typescriptlang.org/docs/handbook/utility-types.html"
+                  target="_blank"
+                  >Utility Types</a
+                >
+              </li>
+            </ul>
+          </section>
+        </section>
+
+        <!-- ======================= GRACIAS ======================= -->
+        <section class="slide-title">
+          <img src="./imgs/axia_logo.png" class="logo" alt="" />
+          <h1>Gracias!</h1>
+          <h2>Módulo 9 Completado</h2>
+          <p class="small-text">Siguiente: Módulo 10 - Módulos</p>
+        </section>
+      </div>
+    </div>
+
+    <!-- Reveal.js Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.2.0/dist/reveal.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.2.0/plugin/highlight/highlight.js"></script>
+    <script>
+      Reveal.initialize({
+        hash: true,
+        slideNumber: true,
+        pdfSeparateFragments: false,
+
+        plugins: [RevealHighlight],
+      });
+    </script>
+  </body>
+</html>
