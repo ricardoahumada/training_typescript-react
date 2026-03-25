@@ -1,0 +1,1159 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Anexo 8A: Patrones TS Avanzados en Front-end</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Lato:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Reveal.js 5.2 CSS -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/reveal.js@5.2.0/dist/reset.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/reveal.js@5.2.0/dist/reveal.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/reveal.js@5.2.0/dist/theme/white.css"
+    />
+
+    <!-- Highlight.js para codigo -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/reveal.js@5.2.0/plugin/highlight/monokai.css"
+    />
+
+    <!-- CSS Personalizado -->
+    <link rel="stylesheet" href="css/custom.css" />
+  </head>
+  <body>
+    <div class="reveal">
+      <div class="slides">
+        <!-- ======================= PORTADA ======================= -->
+        <section class="slide-title">
+          <img src="./imgs/axia_logo.png" class="logo" alt="" />
+          <h1>Anexo 8A</h1>
+          <h2>Patrones TS Avanzados en Front-end</h2>
+          <p class="small-text">Curso: TypeScript</p>
+          <div style="margin-top: 40px">
+            <span class="badge badge-primary">180 min</span>
+          </div>
+        </section>
+
+        <!-- ======================= OBJETIVOS ======================= -->
+        <section>
+          <h2>Objetivos de Aprendizaje</h2>
+          <ul>
+            <li>Implementar type guards para validación de tipos en runtime</li>
+            <li>Crear utility types personalizados para componentes React</li>
+            <li>Implementar contextos con tipos seguros</li>
+            <li>Aplicar patrones de composición en React</li>
+            <li>Implementar discriminated unions para state machines type-safe</li>
+            <li>Crear componentes polimórficos y compound components</li>
+            <li>Implementar validación runtime con Zod</li>
+            <li>Crear custom hooks completamente tipados</li>
+            <li>Implementar hook composition con tipos estrictos</li>
+            <li>Aplicar mapped types y conditional types para utilities avanzadas</li>
+            <li>Utilizar React 18 Concurrency (useTransition, useDeferredValue, Suspense)</li>
+            <li>Implementar tipos en Next.js App Router</li>
+            <li>Crear formularios tipados con React Hook Form + Zod</li>
+          </ul>
+        </section>
+
+        <!-- ======================= SECCION 1: CONTEXTO ======================= -->
+        <section>
+          <section class="section-divider">
+            <h1>1. Contexto</h1>
+            <p>El problema de los tipos en runtime</p>
+          </section>
+
+          <section>
+            <h2>El Problema: Tipos en Runtime</h2>
+            <p>Los datos de APIs externas no tienen tipos en tiempo de ejecución</p>
+            <div class="block-warning">
+              <p><strong>Problema:</strong> TypeScript solo valida en compilación</p>
+            </div>
+            <pre><code class="language-typescript">// Datos que vienen como "any" o tipo genérico
+const datos = fetch('/api/tasks'); // unknown
+
+function procesarTarea(data: unknown) {
+  // ¿Cómo sabemos qué tipo tiene data?
+  // ¿Task? ¿User? ¿Algo más?
+}</code></pre>
+          </section>
+
+          <section>
+            <h2>Escenario: Sistema de Gestión de Tareas</h2>
+            <pre><code class="language-typescript">interface Task {
+  id: string;
+  title: string;
+  description: string;
+  status: 'pending' | 'inProgress' | 'completed';
+  priority: 'low' | 'medium' | 'high';
+}
+
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: 'admin' | 'user';
+}</code></pre>
+            <div class="block-info">
+              <p><strong>Solución:</strong> Los type guards resuelven este problema</p>
+            </div>
+          </section>
+        </section>
+
+        <!-- ======================= SECCION 2: TYPE GUARDS ======================= -->
+        <section>
+          <section class="section-divider">
+            <h1>2. Type Guards</h1>
+            <p>Validación de tipos en runtime</p>
+          </section>
+
+          <section>
+            <h2>¿Qué son los Type Guards?</h2>
+            <p>Funciones que validan el tipo de un valor en tiempo de ejecución</p>
+            <ul>
+              <li>Permiten validar el tipo en runtime</li>
+              <li>TypeScript usa esta información para <strong>narrowing</strong></li>
+              <li>Esenciales para aplicaciones que consumen datos externos</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2>Type Guard con typeof</h2>
+            <pre><code class="language-typescript">function procesarDato(dato: string | number): string {
+  if (typeof dato === 'string') {
+    return dato.toUpperCase(); // TypeScript sabe que es string
+  }
+  return dato.toFixed(2); // TypeScript sabe que es number
+}</code></pre>
+          </section>
+
+          <section>
+            <h2>Type Guard con instanceof</h2>
+            <pre><code class="language-typescript">class Rectangulo {
+  constructor(public ancho: number, public alto: number) {}
+  area() { return this.ancho * this.alto; }
+}
+
+class Circulo {
+  constructor(public radio: number) {}
+  area() { return Math.PI * this.radio ** 2; }
+}
+
+type Figura = Rectangulo | Circulo;
+
+function calcularArea(figura: Figura): number {
+  if (figura instanceof Rectangulo) {
+    return figura.area();
+  }
+  return figura.area();
+}</code></pre>
+          </section>
+
+          <section>
+            <h2>Type Guard Personalizado</h2>
+            <pre><code class="language-typescript">type Persona = Usuario | Administrador;
+
+function isAdministrador(persona: Persona): persona is Administrador {
+  return 'permisos' in persona && persona.tipo === 'admin';
+}
+
+function procesarPersona(persona: Persona) {
+  if (isAdministrador(persona)) {
+    console.log('Admin con permisos:', persona.permisos);
+  } else {
+    console.log('Usuario:', persona.nombre);
+  }
+}</code></pre>
+          </section>
+
+          <section>
+            <h2>Lab: Implementar Type Guards</h2>
+            <div class="block-info">
+              <p><strong>Objetivo:</strong> Validar tipos de datos del sistema de tareas</p>
+            </div>
+            <ol>
+              <li class="fragment">Crear type guard para validar objetos Task</li>
+              <li class="fragment">Crear type guard para validar objetos User</li>
+              <li class="fragment">Crear type guard para validar objetos Tag</li>
+              <li class="fragment">Implementar validación en handlers de API</li>
+            </ol>
+            <pre><code class="language-typescript">function isTask(obj: unknown): obj is Task {
+  return (
+    typeof obj === 'object' &&
+    obj !== null &&
+    'id' in obj &&
+    'title' in obj &&
+    'status' in obj &&
+    'priority' in obj
+  );
+}</code></pre>
+          </section>
+        </section>
+
+        <!-- ======================= SECCION 3: UTILITY TYPES ======================= -->
+        <section>
+          <section class="section-divider">
+            <h1>3. Utility Types Personalizados</h1>
+            <p>Transformando tipos para React</p>
+          </section>
+
+          <section>
+            <h2>¿Qué son los Utility Types?</h2>
+            <p>Tipos predefinidos que transforman otros tipos</p>
+            <ul>
+              <li><strong>Partial&lt;T&gt;</strong>: hace todas las propiedades opcionales</li>
+              <li><strong>Pick&lt;T, K&gt;</strong>: selecciona solo ciertas propiedades</li>
+              <li><strong>Omit&lt;T, K&gt;</strong>: excluye ciertas propiedades</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2>Utility Types para React</h2>
+            <pre><code class="language-typescript">type ButtonProps = {
+  label: string;
+  onClick: () => void;
+  variant: 'primary' | 'secondary';
+};
+
+type LinkButtonProps = Omit&lt;ButtonProps, 'onClick'&gt; & {
+  href: string;
+};</code></pre>
+          </section>
+
+          <section>
+            <h2>Componentes Genéricos Tipados</h2>
+            <pre><code class="language-typescript">interface ListProps&lt;T&gt; {
+  items: T[];
+  renderItem: (item: T) => React.ReactNode;
+  keyExtractor: (item: T) => string;
+}
+
+function List&lt;T&gt;({ items, renderItem, keyExtractor }: ListProps&lt;T&gt;) {
+  return (
+    &lt;ul&gt;
+      {items.map(item => (
+        &lt;li key={keyExtractor(item)}&gt;{renderItem(item)}&lt;/li&gt;
+      ))}
+    &lt;/ul&gt;
+  );
+}</code></pre>
+          </section>
+
+          <section>
+            <h2>Lab: Crear Utility Types</h2>
+            <div class="block-info">
+              <p><strong>Objetivo:</strong> Crear tipos reutilizables para componentes</p>
+            </div>
+            <ol>
+              <li class="fragment">Crear tipo para componentes de lista genéricos</li>
+              <li class="fragment">Crear tipo para formularios</li>
+              <li class="fragment">Crear tipo para respuestas de API</li>
+            </ol>
+          </section>
+        </section>
+
+        <!-- ======================= SECCION 4: CONTEXTOS TIPADOS ======================= -->
+        <section>
+          <section class="section-divider">
+            <h1>4. Contextos Tipados</h1>
+            <p>Estado global con seguridad de tipos</p>
+          </section>
+
+          <section>
+            <h2>¿Por qué tipar el contexto?</h2>
+            <ul>
+              <li>Evita errores de tipo al acceder al contexto</li>
+              <li>Proporciona autocompletado en el IDE</li>
+              <li>Define claramente la estructura del estado global</li>
+              <li>El tipo del reducer define todas las acciones posibles</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2>Contexto con Tipos</h2>
+            <pre><code class="language-typescript">interface TaskManagerState {
+  tasks: Task[];
+  users: User[];
+  tags: Tag[];
+}
+
+type TaskManagerAction =
+  | { type: 'ADD_TASK'; payload: Task }
+  | { type: 'REMOVE_TASK'; payload: string }
+  | { type: 'SET_TAGS'; payload: Tag[] };
+
+interface TaskManagerContextValue {
+  state: TaskManagerState;
+  dispatch: React.Dispatch&lt;TaskManagerAction&gt;;
+}
+
+const TaskManagerContext = createContext&lt;
+  TaskManagerContextValue | undefined
+&gt;(undefined);</code></pre>
+          </section>
+
+          <section>
+            <h2>Provider y Hook Personalizado</h2>
+            <pre><code class="language-typescript">function TaskManagerProvider({ children }: { children: ReactNode }) {
+  const [state, dispatch] = useReducer(taskManagerReducer, initialState);
+  
+  return (
+    &lt;TaskManagerContext.Provider value={{ state, dispatch }}&gt;
+      {children}
+    &lt;/TaskManagerContext.Provider&gt;
+  );
+}
+
+function useTaskManager() {
+  const context = useContext(TaskManagerContext);
+  if (!context) {
+    throw new Error('useTaskManager debe usarse dentro de TaskManagerProvider');
+  }
+  return context;
+}</code></pre>
+          </section>
+
+          <section>
+            <h2>Lab: Implementar Contexto Tipado</h2>
+            <div class="block-info">
+              <p><strong>Objetivo:</strong> Crear un sistema de estado global completamente tipado</p>
+            </div>
+            <ol>
+              <li class="fragment">Definir tipos para el estado global</li>
+              <li class="fragment">Crear el contexto con provider</li>
+              <li class="fragment">Implementar hooks personalizados</li>
+              <li class="fragment">Integrar con los componentes existentes</li>
+            </ol>
+          </section>
+        </section>
+
+        <!-- ======================= SECCION 5: DISCRIMINATED UNIONS ======================= -->
+        <section>
+          <section class="section-divider">
+            <h1>5. Discriminated Unions</h1>
+            <p>State Machines Type-Safe</p>
+          </section>
+
+          <section>
+            <h2>¿Qué son las Discriminated Unions?</h2>
+            <p>Patrón fundamental que usa una propiedad común (discriminador) para identificar la variante</p>
+            <ul>
+              <li>TypeScript infiere automáticamente el tipo según el discriminador</li>
+              <li>Permite <strong>exhaustiveness checking</strong></li>
+              <li>Ideales para reducers y gestión de estado compleja</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2>Estructura Básica</h2>
+            <pre><code class="language-typescript">type TaskManagerAction =
+  | { type: 'ADD_TASK'; payload: Task }
+  | { type: 'REMOVE_TASK'; payload: string }
+  | { type: 'UPDATE_TASK'; payload: Task }
+  | { type: 'SET_TASKS'; payload: Task[] }
+  | { type: 'ADD_TAG'; payload: Tag }
+  | { type: 'SET_TAGS'; payload: Tag[] }
+  | { type: 'CLEAR_ERROR' };</code></pre>
+          </section>
+
+          <section>
+            <h2>Reducer con Type Safety</h2>
+            <pre><code class="language-typescript">function taskReducer(state: TaskManagerState, action: TaskManagerAction): TaskManagerState {
+  switch (action.type) {
+    case 'ADD_TASK':
+      // TypeScript sabe que action.payload es Task
+      return { ...state, tasks: [...state.tasks, action.payload] };
+    
+    case 'REMOVE_TASK':
+      // TypeScript sabe que action.payload es string
+      return { ...state, tasks: state.tasks.filter(t => t.id !== action.payload) };
+    
+    // ...
+    
+    default:
+      // Exhaustiveness checking
+      const _exhaustive: never = action;
+      return state;
+  }
+}</code></pre>
+            <div class="block-info">
+              <p><strong>Ventaja:</strong> Si falta un caso, error de compilación</p>
+            </div>
+          </section>
+
+          <section>
+            <h2>Lab: Implementar Discriminated Unions</h2>
+            <div class="block-info">
+              <p><strong>Objetivo:</strong> Crear un sistema de estado type-safe</p>
+            </div>
+            <ol>
+              <li class="fragment">Definir tipos de acciones para gestión de tareas</li>
+              <li class="fragment">Definir tipos de acciones para gestión de etiquetas</li>
+              <li class="fragment">Implementar reducer con exhaustiveness checking</li>
+              <li class="fragment">Integrar con useReducer de React</li>
+            </ol>
+          </section>
+        </section>
+
+        <!-- ======================= SECCION 6: COMPONENTES AVANZADOS ======================= -->
+        <section>
+          <section class="section-divider">
+            <h1>6. Componentes Avanzados</h1>
+            <p>Polimórficos, Compound y forwardRef</p>
+          </section>
+
+          <section>
+            <h2>Tipos de Componentes Avanzados</h2>
+            <ul>
+              <li><strong>Componentes polimórficos:</strong> mismo componente puede renderizar como button, link, etc.</li>
+              <li><strong>Compound components:</strong> API declarativa donde componentes hijos se comunican con el padre</li>
+              <li><strong>forwardRef:</strong> acceder a elementos del DOM</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2>Componente Polimórfico</h2>
+            <pre><code class="language-typescript">type PolymorphicRef&lt;C extends React.ElementType&gt; =
+  React.ComponentPropsWithRef&lt;C&gt;['ref'];
+
+interface ComponentePolimorficoProps&lt;T extends React.ElementType = 'button'&gt; {
+  as?: T;
+  children: React.ReactNode;
+  ref?: PolymorphicRef&lt;T&gt;;
+}
+
+const ComponentePolimorfico = React.forwardRef(
+  &lt;T extends React.ElementType = 'button'&gt;(
+    { as, children, ...props }: ComponentePolimorficoProps&lt;T&gt;,
+    ref: PolymorphicRef&lt;T&gt;
+  ) => {
+    const Component = as || 'button';
+    return &lt;Component ref={ref} {...props}&gt;{children}&lt;/Component&gt;;
+  }
+);</code></pre>
+          </section>
+
+          <section>
+            <h2>Compound Components</h2>
+            <pre><code class="language-typescript">function TaskManager({ children }: TaskManagerCompoundProps) {
+  return &lt;div className="task-manager"&gt;{children}&lt;/div&gt;;
+}
+
+function TaskManagerItem({ children, value }: TaskManagerItemProps) {
+  return &lt;div data-value={value}&gt;{children}&lt;/div&gt;;
+}
+
+TaskManager.Item = TaskManagerItem;
+
+// Uso
+&lt;TaskManager&gt;
+  &lt;TaskManager.Label&gt;My Tasks&lt;/TaskManager.Label&gt;
+  &lt;TaskManager.Item value="task1"&gt;Learn TypeScript&lt;/TaskManager.Item&gt;
+&lt;/TaskManager&gt;</code></pre>
+          </section>
+
+          <section>
+            <h2>forwardRef con Tipos</h2>
+            <pre><code class="language-typescript">const InputBase: ForwardRefRenderFunction&lt;InputRef, InputProps&gt; = (
+  { label, error, ...props },
+  ref
+) => {
+  return (
+    &lt;div&gt;
+      &lt;label&gt;{label}&lt;/label&gt;
+      &lt;input ref={ref} {...props} /&gt;
+      {error && &lt;span className="error"&gt;{error}&lt;/span&gt;}
+    &lt;/div&gt;
+  );
+};
+
+const Input = forwardRef(InputBase);</code></pre>
+          </section>
+
+          <section>
+            <h2>Lab: Crear Componentes Avanzados</h2>
+            <div class="block-info">
+              <p><strong>Objetivo:</strong> Implementar componentes reutilizables y avanzados</p>
+            </div>
+            <ol>
+              <li class="fragment">Crear componente polimórfico Botón</li>
+              <li class="fragment">Implementar compound component PanelTareas</li>
+              <li class="fragment">Implementar Input con forwardRef</li>
+              <li class="fragment">Crear HOC con tipos para internacionalización</li>
+            </ol>
+          </section>
+        </section>
+
+        <!-- ======================= SECCION 7: ZOD ======================= -->
+        <section>
+          <section class="section-divider">
+            <h1>7. Validación Runtime con Zod</h1>
+            <p>Esquemas con inferencia automática de tipos</p>
+          </section>
+
+          <section>
+            <h2>¿Qué es Zod?</h2>
+            <p>Librería de validación de esquemas que permite validar datos en runtime e inferir tipos para TypeScript</p>
+            <div class="block-info">
+              <p><strong>Problema resuelto:</strong> TypeScript no valida en ejecución</p>
+            </div>
+          </section>
+
+          <section>
+            <h2>Esquemas con Inferencia</h2>
+            <pre><code class="language-typescript">import { z } from 'zod';
+
+const LibroSchema = z.object({
+  id: z.string().uuid(),
+  titulo: z.string().min(1).max(200),
+  autor: z.string().min(1),
+  año: z.number().int().positive(),
+  disponible: z.boolean(),
+});
+
+// Inferir tipo desde schema
+type Libro = z.infer&lt;typeof LibroSchema&gt;;
+
+// Validar datos
+function validarLibro(data: unknown): Libro {
+  return LibroSchema.parse(data);
+}</code></pre>
+          </section>
+
+          <section>
+            <h2>Integración con React Hook Form</h2>
+            <pre><code class="language-typescript">import { zodResolver } from '@hookform/resolvers/zod';
+
+const SocioSchema = z.object({
+  nombre: z.string().min(2, 'Nombre muy corto'),
+  email: z.string().email('Email inválido'),
+  telefono: z.string().regex(/^\d{9}$/, 'Teléfono debe tener 9 dígitos'),
+});
+
+type SocioForm = z.infer&lt;typeof SocioSchema&gt;;
+
+function FormularioSocio() {
+  const { register, handleSubmit, formState: { errors } } = useForm&lt;SocioForm&gt;({
+    resolver: zodResolver(SocioSchema),
+  });</code></pre>
+          </section>
+
+          <section>
+            <h2>Lab: Implementar Validación con Zod</h2>
+            <div class="block-info">
+              <p><strong>Objetivo:</strong> Añadir validación runtime completa</p>
+            </div>
+            <ol>
+              <li class="fragment">Crear schemas Zod para todas las entidades</li>
+              <li class="fragment">Implementar validación en handlers de API</li>
+              <li class="fragment">Crear integración con formulario de Task</li>
+              <li class="fragment">Validar respuestas de la API</li>
+            </ol>
+          </section>
+        </section>
+
+        <!-- ======================= SECCION 8: CUSTOM HOOKS ======================= -->
+        <section>
+          <section class="section-divider">
+            <h1>8. Custom Hooks Tipados</h1>
+            <p>Hooks personalizados con tipos estrictos</p>
+          </section>
+
+          <section>
+            <h2>¿Por qué tipar los hooks?</h2>
+            <ul>
+              <li>Proporcionan autocompletado al usar el hook</li>
+              <li>Definen claramente qué datos devuelve el hook</li>
+              <li>Validan que se usan correctamente</li>
+              <li>Permiten crear hooks genéricos reutilizables</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2>useState y useEffect con Tipos</h2>
+            <pre><code class="language-typescript">// Tipado explícito
+const [usuario, setUsuario] = useState&lt;Usuario | null&gt;(null);
+
+// Tipado con genérico
+const [items, setItems] = useState&lt;Libro[]&gt;([]);
+
+function useCargarLibros() {
+  const [libros, setLibros] = useState&lt;Libro[]&gt;([]);
+  const [cargando, setCargando] = useState(true);
+  const [error, setError] = useState&lt;Error | null&gt;(null);
+
+  useEffect(() => {
+    async function fetchLibros() {
+      try {
+        const response = await fetch('/api/libros');
+        const data = await response.json();
+        setLibros(data);
+      } catch (e) {
+        setError(e as Error);
+      } finally {
+        setCargando(false);
+      }
+    }
+    fetchLibros();
+  }, []);
+
+  return { libros, cargando, error };
+}</code></pre>
+          </section>
+
+          <section>
+            <h2>Hooks Genéricos</h2>
+            <pre><code class="language-typescript">function useColeccion&lt;T extends { id: string }&gt;(endpoint: string) {
+  const [items, setItems] = useState&lt;T[]&gt;([]);
+  const [cargando, setCargando] = useState(false);
+
+  const agregar = useCallback((item: T) => {
+    setItems(prev => [...prev, item]);
+  }, []);
+
+  const eliminar = useCallback((id: string) => {
+    setItems(prev => prev.filter(item => item.id !== id));
+  }, []);
+
+  return { items, cargando, agregar, eliminar };
+}
+
+// Uso con tipo específico
+const { items: libros, agregar, eliminar } = useColeccion&lt;Libro&gt;('/api/libros');</code></pre>
+          </section>
+
+          <section>
+            <h2>Lab: Crear Custom Hooks Tipados</h2>
+            <div class="block-info">
+              <p><strong>Objetivo:</strong> Implementar hooks con tipos estrictos</p>
+            </div>
+            <ol>
+              <li class="fragment">Crear hook useLibros para cargar y gestionar libros</li>
+              <li class="fragment">Crear hook useSocios para gestionar socios</li>
+              <li class="fragment">Crear hook usePrestamos para gestionar préstamos</li>
+              <li class="fragment">Implementar hook genérico useLocalStorage</li>
+            </ol>
+          </section>
+        </section>
+
+        <!-- ======================= SECCION 9: REACT 18 CONCURRENCY ======================= -->
+        <section>
+          <section class="section-divider">
+            <h1>9. React 18 Concurrency</h1>
+            <p>Mantener la UI responsiva</p>
+          </section>
+
+          <section>
+            <h2>¿Por qué usar Concurrencia?</h2>
+            <p>React 18 introdujo capacidades que permiten trabajar en múltiples tareas simultáneamente</p>
+            <ul>
+              <li><strong>useTransition:</strong> marca actualizaciones como "no urgentes"</li>
+              <li><strong>useDeferredValue:</strong> retrasa valores para evitar bloqueos</li>
+              <li><strong>Suspense:</strong> permite mostrar estados de carga controlados</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2>useTransition</h2>
+            <pre><code class="language-typescript">function BusquedaTareas() {
+  const [busqueda, setBusqueda] = useState('');
+  const [resultados, setResultados] = useState&lt;Task[]&gt;([]);
+  
+  const [isPending, startTransition] = useTransition();
+
+  const handleBuscar = (query: string) => {
+    setBusqueda(query);
+    
+    // La búsqueda se marca como transición
+    startTransition(() => {
+      const filtrados = tasks.filter(task => 
+        task.title.toLowerCase().includes(query.toLowerCase())
+      );
+      setResultados(filtrados);
+    });
+  };
+
+  return (
+    &lt;div&gt;
+      &lt;input value={busqueda} onChange={(e) => handleBuscar(e.target.value)} /&gt;
+      {isPending && &lt;Spinner /&gt;}
+      &lt;ListaTareas tasks={resultados} /&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+          </section>
+
+          <section>
+            <h2>useDeferredValue</h2>
+            <pre><code class="language-typescript">function ListaFiltrada({ items }: { items: Task[] }) {
+  const [filtro, setFiltro] = useState('');
+  
+  // DeferredValue retrasa el valor
+  const filtroDiferido = useDeferredValue(filtro);
+  
+  const itemsFiltrados = useMemo(
+    () => items.filter(item => 
+      item.title.includes(filtroDiferido)
+    ),
+    [items, filtroDiferido]
+  );
+
+  return (
+    &lt;div&gt;
+      &lt;input value={filtro} onChange={e => setFiltro(e.target.value)} /&gt;
+      &lt;ul&gt;{itemsFiltrados.map(item => (
+        &lt;li key={item.id}&gt;{item.title}&lt;/li&gt;
+      ))}&lt;/ul&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+          </section>
+
+          <section>
+            <h2>Suspense para Data Fetching</h2>
+            <pre><code class="language-typescript">function ListaTareas() {
+  const tasks = use(fetchTasks());
+  
+  return (
+    &lt;ul&gt;
+      {tasks.map(task => (
+        &lt;li key={task.id}&gt;{task.title}&lt;/li&gt;
+      ))}
+    &lt;/ul&gt;
+  );
+}
+
+function PaginaTareas() {
+  return (
+    &lt;Suspense fallback={&lt;Loading /&gt;}&gt;
+      &lt;ListaTareas /&gt;
+    &lt;/Suspense&gt;
+  );
+}</code></pre>
+          </section>
+
+          <section>
+            <h2>Lab: Implementar React 18 Concurrency</h2>
+            <div class="block-info">
+              <p><strong>Objetivo:</strong> Implementar búsqueda con transición</p>
+            </div>
+            <ol>
+              <li class="fragment">Implementar useTransition para búsqueda de tareas</li>
+              <li class="fragment">Implementar useDeferredValue para listados grandes</li>
+              <li class="fragment">Crear componentes con Suspense para data fetching</li>
+            </ol>
+          </section>
+        </section>
+
+        <!-- ======================= SECCION 10: NEXT.JS APP ROUTER ======================= -->
+        <section>
+          <section class="section-divider">
+            <h1>10. Tipos en Next.js App Router</h1>
+            <p>Server y Client Components</p>
+          </section>
+
+          <section>
+            <h2>Server vs Client Components</h2>
+            <ul>
+              <li><strong>Server Components:</strong> por defecto, pueden ser async, fetching directo a DB</li>
+              <li><strong>Client Components:</strong> necesitan directiva 'use client', usan hooks y estado</li>
+              <li>Las props de pages y API routes tienen tipos específicos</li>
+              <li>Server Actions requieren tipado para validación</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2>Server Component</h2>
+            <pre><code class="language-typescript">// app/tasks/page.tsx - Server Component
+interface PageProps {
+  params: Promise&lt;{ estado?: string }&gt;;
+  searchParams: Promise&lt;{ q?: string }&gt;;
+}
+
+export default async function PaginaTareas({
+  params, 
+  searchParams 
+}: PageProps) {
+  const { estado } = await params;
+  const { q } = await searchParams;
+  
+  const tasks = await getTasks();
+  
+  return (
+    &lt;main&gt;
+      &lt;h1&gt;Tareas{estado && ` - ${estado}`}&lt;/h1&gt;
+      &lt;ListaTareas tasks={tasks} /&gt;
+    &lt;/main&gt;
+  );
+}</code></pre>
+          </section>
+
+          <section>
+            <h2>Client Component</h2>
+            <pre><code class="language-typescript">// app/components/Busqueda.tsx - Client Component
+'use client';
+
+import { useState, useTransition } from 'react';
+
+interface BusquedaProps {
+  onBuscar: (query: string) => void;
+}
+
+export function Busqueda({ onBuscar }: BusquedaProps) {
+  const [query, setQuery] = useState('');
+  const [isPending, startTransition] = useTransition();
+
+  return (
+    &lt;div&gt;
+      &lt;input 
+        value={query}
+        onChange={(e) => {
+          startTransition(() => {
+            onBuscar(e.target.value);
+          });
+        }}
+      /&gt;
+      {isPending && &lt;span&gt;Buscando...&lt;/span&gt;}
+    &lt;/div&gt;
+  );
+}</code></pre>
+          </section>
+
+          <section>
+            <h2>API Routes con Tipos</h2>
+            <pre><code class="language-typescript">// app/api/prestamos/route.ts
+const PrestamoSchema = z.object({
+  idLibro: z.string().uuid(),
+  idSocio: z.string().uuid(),
+  dias: z.number().int().positive().max(30),
+});
+
+export async function POST(request: NextRequest) {
+  const body = await request.json();
+  const resultado = PrestamoSchema.safeParse(body);
+  
+  if (!resultado.success) {
+    return NextResponse.json(
+      { error: 'Datos inválidos', details: resultado.error.errors },
+      { status: 400 }
+    );
+  }
+
+  const prestamo = await crearPrestamo(resultado.data);
+  return NextResponse.json({ success: true, data: prestamo }, { status: 201 });
+}</code></pre>
+          </section>
+
+          <section>
+            <h2>Lab: Tipos en Next.js</h2>
+            <div class="block-info">
+              <p><strong>Objetivo:</strong> Implementar tipos completos en Next.js App Router</p>
+            </div>
+            <ol>
+              <li class="fragment">Crear Server Component para listar libros</li>
+              <li class="fragment">Crear Client Component para búsqueda</li>
+              <li class="fragment">Implementar API Route para préstamos con Zod</li>
+            </ol>
+          </section>
+        </section>
+
+        <!-- ======================= SECCION 11: FORMULARIOS TIPADOS ======================= -->
+        <section>
+          <section class="section-divider">
+            <h1>11. Formularios Tipados</h1>
+            <p>React Hook Form + Zod</p>
+          </section>
+
+          <section>
+            <h2>¿Por qué esta combinación?</h2>
+            <ul>
+              <li><strong>React Hook Form:</strong> rendimiento óptimo (no re-renderiza en cada input)</li>
+              <li><strong>Zod:</strong> validación en runtime con inferencia automática</li>
+              <li>El tipo del formulario se infiere del schema Zod</li>
+              <li>Integración con zodResolver</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2>Configuración Completa</h2>
+            <pre><code class="language-typescript">const RegistroSocioSchema = z.object({
+  nombre: z.string()
+    .min(2, 'El nombre debe tener al menos 2 caracteres')
+    .max(50),
+  email: z.string().email('Email inválido'),
+  telefono: z.string().regex(/^\d{9}$/, 'Teléfono debe tener 9 dígitos'),
+  categoria: z.enum(['estudiante', 'profesor', 'externo']),
+});
+
+type RegistroSocioForm = z.infer&lt;typeof RegistroSocioSchema&gt;;
+
+function FormularioRegistro() {
+  const { register, handleSubmit, formState: { errors } } = useForm&lt;RegistroSocioForm&gt;({
+    resolver: zodResolver(RegistroSocioSchema),
+  });
+
+  const onSubmit = async (data: RegistroSocioForm) => {
+    await fetch('/api/socios', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+  };
+
+  return (
+    &lt;form onSubmit={handleSubmit(onSubmit)}&gt;
+      {/* ... campos del formulario */}
+    &lt;/form&gt;
+  );
+}</code></pre>
+          </section>
+
+          <section>
+            <h2>Campos Dinámicos</h2>
+            <pre><code class="language-typescript">function AutoresField({ control, register, errors }: AutoresFieldProps) {
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: 'autores'
+  });
+
+  return (
+    &lt;div&gt;
+      {fields.map((field, index) => (
+        &lt;div key={field.id}&gt;
+          &lt;input {...register(`autores.${index}.nombre` as const)} /&gt;
+          &lt;input {...register(`autores.${index}.email` as const)} /&gt;
+          &lt;button type="button" onClick={() => remove(index)}&gt;Eliminar&lt;/button&gt;
+        &lt;/div&gt;
+      ))}
+      &lt;button type="button" onClick={() => append({ nombre: '', email: '' })}&gt;
+        Añadir autor
+      &lt;/button&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+          </section>
+        </section>
+
+        <!-- ======================= SECCION 12: MAPPED TYPES ======================= -->
+        <section>
+          <section class="section-divider">
+            <h1>12. Mapped Types & Conditional Types</h1>
+            <p>Transformación dinámica de tipos</p>
+          </section>
+
+          <section>
+            <h2>¿Por qué usarlos?</h2>
+            <ul>
+              <li><strong>Mapped Types:</strong> transformar propiedades de un tipo</li>
+              <li><strong>Conditional Types:</strong> crear tipos que dependen de otros tipos</li>
+              <li>Crear utility types personalizados</li>
+              <li>Validar y transformar tipos en tiempo de compilación</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2>Mapped Types</h2>
+            <pre><code class="language-typescript">// Transformar todas las propiedades a opcionales
+type Partial&lt;T&gt; = {
+  [P in keyof T]?: T[P];
+};
+
+// Hacer todas las fechas strings
+type FechasAString&lt;T&gt; = {
+  [P in keyof T]: T[P] extends Date ? string : T[P];
+};
+
+interface Prestamo {
+  id: string;
+  fechaInicio: Date;
+  fechaFin: Date;
+}
+
+type PrestamoSerializado = FechasAString&lt;Prestamo&gt;;
+// { id: string; fechaInicio: string; fechaFin: string; }</code></pre>
+          </section>
+
+          <section>
+            <h2>Conditional Types</h2>
+            <pre><code class="language-typescript">// Tipo condicional básico
+type IsString&lt;T&gt; = T extends string ? true : false;
+
+// Extraer el tipo de elemento de un array
+type ElementType&lt;T&gt; = T extends (infer U)[] ? U : never;
+
+// Obtener tipo de retorno de una función
+type ReturnType&lt;T&gt; = T extends (...args: any[]) => infer R ? R : never;</code></pre>
+          </section>
+
+          <section>
+            <h2>Type-Safe API Responses</h2>
+            <pre><code class="language-typescript">type ApiSuccess&lt;T&gt; = {
+  success: true;
+  data: T;
+};
+
+type ApiError = {
+  success: false;
+  error: string;
+  code: number;
+};
+
+type ApiResponse&lt;T&gt; = ApiSuccess&lt;T&gt; | ApiError;
+
+function handleResponse&lt;T&gt;(response: ApiResponse&lt;T&gt;) {
+  if (response.success) {
+    // TypeScript sabe que response.data existe
+    console.log(response.data);
+  } else {
+    // TypeScript sabe que response.error existe
+    console.error(response.error, response.code);
+  }
+}</code></pre>
+          </section>
+
+          <section>
+            <h2>Lab: Implementar Mapped Types</h2>
+            <div class="block-info">
+              <p><strong>Objetivo:</strong> Crear utility types personalizados</p>
+            </div>
+            <ol>
+              <li class="fragment">Crear tipo para transformar fechas a strings</li>
+              <li class="fragment">Implementar tipo para respuestas de API</li>
+              <li class="fragment">Crear tipo para seleccionar subconjuntos</li>
+              <li class="fragment">Implementar tipo para propiedades opcionales condicionales</li>
+            </ol>
+          </section>
+        </section>
+
+        <!-- ======================= RESUMEN ======================= -->
+        <section>
+          <section class="section-divider">
+            <h1>Resumen</h1>
+          </section>
+
+          <section>
+            <h2>Puntos Clave</h2>
+            <ul>
+              <li>Type guards permiten validar tipos en runtime</li>
+              <li>Utility types simplifican la manipulación de props</li>
+              <li>Contextos tipados proporcionan seguridad en el estado global</li>
+              <li>Componentes genéricos permiten reutilización</li>
+              <li>Discriminated Unions: máquinas de estado type-safe</li>
+              <li>Componentes polimórficos: flexibilidad con tipos seguros</li>
+              <li>Compound Components: patrón de composición declarativo</li>
+              <li>Zod: validación runtime con inferencia automática</li>
+              <li>Custom hooks tipados: useState&lt;T&gt;, useEffect, useRef&lt;T&gt;</li>
+              <li>Hook composition: combinar hooks para funcionalidad compleja</li>
+              <li>Mapped Types: transformar tipos existentes</li>
+              <li>Conditional Types: tipos condicionales</li>
+            </ul>
+          </section>
+        </section>
+
+        <!-- ======================= EJERCICIO INTEGRADOR ======================= -->
+        <section>
+          <section class="section-divider">
+            <h1>Ejercicio Integrador</h1>
+            <p>Extensión del Caso 2</p>
+          </section>
+
+          <section>
+            <h2>Objetivo</h2>
+            <div class="block-info">
+              <p>Implementar un sistema completo de biblioteca con patrones avanzados</p>
+            </div>
+            <ul>
+              <li>Sistema de validación de formularios con Zod</li>
+              <li>Sistema de notificaciones tipado</li>
+              <li>Lógica de negocio con type guards</li>
+              <li>Componentes de orden superior (HOCs) tipados</li>
+              <li>useTransition para búsquedas en tiempo real</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2>Requisitos del Sistema</h2>
+            <ul>
+              <li>Validar todos los datos de entrada con Zod</li>
+              <li>Mostrar notificaciones tipadas según el tipo de operación</li>
+              <li>Gestionar errores de forma tipada</li>
+              <li>Utilizar useTransition para listados grandes</li>
+              <li>Implementar componentes polimórficos</li>
+              <li>Comportarse de forma predecible gracias a los tipos</li>
+            </ul>
+          </section>
+        </section>
+
+        <!-- ======================= REFERENCIAS ======================= -->
+        <section>
+          <section class="section-divider">
+            <h1>Referencias</h1>
+          </section>
+
+          <section>
+            <h2>Recursos Adicionales</h2>
+            <ul>
+              <li><a href="https://www.typescriptlang.org/docs/handbook/2/narrowing.html">Type Guards en TypeScript</a></li>
+              <li><a href="https://www.typescriptlang.org/docs/handbook/2/utility-types.html">Utility Types</a></li>
+              <li><a href="https://react.dev/learn/passing-data-deeply-with-context">React Context con TypeScript</a></li>
+              <li><a href="https://react.dev/reference/react/useTransition">useTransition</a></li>
+              <li><a href="https://zod.dev">Zod - TypeScript-first schema validation</a></li>
+              <li><a href="https://nextjs.org/docs/app">Next.js App Router</a></li>
+            </ul>
+          </section>
+        </section>
+
+        <!-- ======================= GRACIAS ======================= -->
+        <section class="slide-title">
+          <img src="./imgs/axia_logo.png" class="logo" alt="" />
+          <h1>Gracias!</h1>
+          <h2>Anexo 8A Completado</h2>
+          <p class="small-text">Siguiente: Anexo 12A - Testing con TypeScript</p>
+        </section>
+      </div>
+    </div>
+
+    <!-- Reveal.js 5.2 -->
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.2.0/dist/reveal.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.2.0/plugin/notes/notes.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.2.0/plugin/markdown/markdown.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.2.0/plugin/highlight/highlight.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.2.0/plugin/zoom/zoom.js"></script>
+
+    <script>
+      // Inicializar Reveal.js
+      Reveal.initialize({
+        hash: true,
+        slideNumber: "c/t",
+        showSlideNumber: "all",
+        progress: true,
+        history: true,
+        center: true,
+        transition: "slide",
+        transitionSpeed: "default",
+        backgroundTransition: "fade",
+        width: 1280,
+        height: 720,
+        margin: 0.1,
+        pdfSeparateFragments: false, 
+
+        // Plugins
+        plugins: [RevealNotes, RevealMarkdown, RevealHighlight, RevealZoom],
+      });
+    </script>
+  </body>
+</html>

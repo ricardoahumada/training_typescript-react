@@ -1,0 +1,557 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Anexo 5A: SSR</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Lato:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Reveal.js 5.2 CSS -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/reveal.js@5.2.0/dist/reset.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/reveal.js@5.2.0/dist/reveal.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/reveal.js@5.2.0/dist/theme/white.css"
+    />
+
+    <!-- Highlight.js para codigo -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/reveal.js@5.2.0/plugin/highlight/monokai.css"
+    />
+
+    <!-- CSS Personalizado -->
+    <link rel="stylesheet" href="css/custom.css" />
+  </head>
+  <body>
+    <div class="reveal">
+      <div class="slides">
+        <!-- ======================= PORTADA ======================= -->
+        <section class="slide-title">
+          <img src="./imgs/axia_logo.png" class="logo" alt="" />
+          <h1>Anexo 5A</h1>
+          <h2>SSR: Frameworks para Rendering en Backend</h2>
+          <p class="small-text">Curso: TypeScript</p>
+          <div style="margin-top: 40px">
+            <span class="badge badge-primary">90 min</span>
+          </div>
+        </section>
+
+        <!-- ======================= OBJETIVOS ======================= -->
+        <section>
+          <h2>Objetivos de Aprendizaje</h2>
+          <ul>
+            <li>Comprender que Webpack NO hace SSR - solo empaqueta</li>
+            <li>Conocer los frameworks modernos para SSR: Next.js, Remix, Astro</li>
+            <li>Evaluar cuando migrar de Webpack SPA a SSR</li>
+            <li>Aplicar el patrón correcto según el tipo de aplicación</li>
+            <li>Migrar de SPA Webpack a Next.js SSR</li>
+            <li>Tipar Server Components con params y searchParams</li>
+            <li>Implementar Data Fetching con tipos y Zod</li>
+            <li>Usar Streaming y Suspense con tipos</li>
+            <li>Configurar Metadata API para SEO</li>
+            <li>Crear API Routes avanzados con validación</li>
+          </ul>
+        </section>
+
+        <!-- ======================= SECCIONES ======================= -->
+
+        <!-- SECCION 1: Contexto -->
+        <section>
+          <section class="section-divider">
+            <h1>1. Contexto: El problema del cliente</h1>
+            <p>10 minutos</p>
+          </section>
+
+          <section>
+            <h2>Escenario: "Se renderiza en el back"</h2>
+            <p><strong>La confusión común:</strong></p>
+            <ul>
+              <li>"Uso Webpack" → pero Webpack solo empaqueta, NO hace SSR</li>
+              <li>"Quiero renderizar en backend" → necesitas un FRAMEWORK</li>
+            </ul>
+            <div class="block-warning">
+              <p><strong>Lo que el cliente ACTUALMENTE tiene:</strong></p>
+              <p>Webpack → empaqueta JS → navegador → React hydrate → render (NO es SSR)</p>
+            </div>
+          </section>
+
+          <section>
+            <h2>Webpack != SSR</h2>
+            <table>
+              <tr><th>Herramienta</th><th>Tipo</th><th>Hace SSR?</th></tr>
+              <tr><td>Webpack</td><td>Bundler</td><td>NO</td></tr>
+              <tr><td>Vite</td><td>Dev server + Bundler</td><td>NO</td></tr>
+              <tr><td>Next.js</td><td>Framework</td><td>SI</td></tr>
+              <tr><td>Remix</td><td>Framework</td><td>SI</td></tr>
+              <tr><td>Astro</td><td>Framework</td><td>SI</td></tr>
+            </table>
+          </section>
+        </section>
+
+        <!-- SECCION 2: Webpack != SSR -->
+        <section>
+          <section class="section-divider">
+            <h1>2. Webpack != SSR</h1>
+            <p>10 minutos</p>
+          </section>
+
+          <section>
+            <h2>Cuándo Migrar a Next.js</h2>
+            <table>
+              <tr><th>Señal</th><th>Acción</th></tr>
+              <tr><td>Contenido cambia frecuentemente</td><td>Migrar a SSR</td></tr>
+              <tr><td>SEO es importante</td><td>Migrar a SSR</td></tr>
+              <tr><td>Primer paint lenta</td><td>Migrar a SSR</td></tr>
+              <tr><td>App muy interactiva (dashboards)</td><td>Quedarse en SPA</td></tr>
+            </table>
+            <div class="block-success">
+              <p><strong>Beneficios:</strong> SEO mejorado, FCP más rápido, mejor UX</p>
+            </div>
+          </section>
+        </section>
+
+        <!-- SECCION 3: Next.js -->
+        <section>
+          <section class="section-divider">
+            <h1>3. Next.js</h1>
+            <p>15 minutos</p>
+          </section>
+
+          <section>
+            <h2>¿Por qué Next.js?</h2>
+            <ul>
+              <li>Más popular (20M+ descargas/semana)</li>
+              <li>Usa Webpack internamente (o Turbopack)</li>
+              <li>Vercel detrás</li>
+              <li>App Router (React Server Components)</li>
+              <li>API Routes integradas</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2>Crear proyecto Next.js</h2>
+            <pre><code class="language-bash">npx create-next-app@latest my-app --typescript</code></pre>
+          </section>
+
+          <section>
+            <h2>Lab: Crear proyecto Next.js básico</h2>
+            <div class="block-info">
+              <p><strong>Objetivo:</strong> Crear una app Next.js con SSR desde cero</p>
+            </div>
+            <ol>
+              <li class="fragment">Ejecutar npx create-next-app@latest</li>
+              <li class="fragment">Configurar: App Router, TypeScript</li>
+              <li class="fragment">Ejecutar npm run dev</li>
+              <li class="fragment">Verificar View Source en navegador</li>
+            </ol>
+          </section>
+        </section>
+
+        <!-- SECCION 4: Server vs Client Components -->
+        <section>
+          <section class="section-divider">
+            <h1>4. Server vs Client Components</h1>
+            <p>15 minutos</p>
+          </section>
+
+          <section>
+            <h2>La regla de oro</h2>
+            <p>En Next.js App Router, los componentes son Server Components por defecto.</p>
+            <table>
+              <tr><th>Característica</th><th>Server</th><th>Client</th></tr>
+              <tr><td>Renderizado</td><td>Servidor</td><td>Cliente</td></tr>
+              <tr><td>Hooks (useState, useEffect)</td><td>No</td><td>Sí</td></tr>
+              <tr><td>Event handlers</td><td>No</td><td>Sí</td></tr>
+              <tr><td>Acceso BD/FS</td><td>Sí</td><td>No</td></tr>
+            </table>
+          </section>
+
+          <section>
+            <h2>Árbol de decisiones</h2>
+            <pre><code class="language-text">¿Tiene interactividad? (useState, onClick)
+  → SI → Client Component ('use client')
+  → NO → ¿Accede a BD/FS?
+      → SI → Server Component
+      → NO → Server Component (por defecto)</code></pre>
+          </section>
+
+          <section>
+            <h2>Lab: Migrar componente a Server Component</h2>
+            <div class="block-info">
+              <p><strong>Objetivo:</strong> Convertir un componente de SPA en Server Component</p>
+            </div>
+            <ol>
+              <li class="fragment">Analizar qué necesita el componente</li>
+              <li class="fragment">Si no tiene interactividad → Server Component</li>
+              <li class="fragment">Si tiene useState/useEffect → 'use client'</li>
+            </ol>
+          </section>
+        </section>
+
+        <!-- SECCION 5: Routing y API Routes -->
+        <section>
+          <section class="section-divider">
+            <h1>5. Routing y API Routes</h1>
+            <p>15 minutos</p>
+          </section>
+
+          <section>
+            <h2>Routing: app/tasks/[id]/page.tsx</h2>
+            <pre><code class="language-typescript">interface PageParams {
+  params: { id: string };
+}
+
+export default async function TaskPage({ params }: PageParams) {
+  const task = await getTask(params.id);
+  return &lt;TaskDetail task={task} /&gt;;
+}</code></pre>
+          </section>
+
+          <section>
+            <h2>Route Handlers: app/api/tasks/route.ts</h2>
+            <pre><code class="language-typescript">export async function GET() {
+  const tasks = await getTasks();
+  return NextResponse.json(tasks);
+}
+
+export async function POST(request: NextRequest) {
+  const body = await request.json();
+  const created = await createTask(body);
+  return NextResponse.json(created, { status: 201 });
+}</code></pre>
+          </section>
+
+          <section>
+            <h2>Lab: Crear rutas y API en Next.js</h2>
+            <div class="block-info">
+              <p><strong>Objetivo:</strong> Crear routing y API para la app de tareas</p>
+            </div>
+            <ol>
+              <li class="fragment">Crear app/tasks/page.tsx</li>
+              <li class="fragment">Crear app/tasks/[id]/page.tsx</li>
+              <li class="fragment">Crear app/api/tasks/route.ts</li>
+            </ol>
+          </section>
+        </section>
+
+        <!-- SECCION 6: Tipado de Server Components -->
+        <section>
+          <section class="section-divider">
+            <h1>6. Tipado de Server Components</h1>
+            <p>15 minutos</p>
+          </section>
+
+          <section>
+            <h2>Params como Promise (Next.js 15+)</h2>
+            <pre><code class="language-typescript">interface PageProps {
+  params: Promise<{ id: string }>;
+}
+
+export default async function TaskPage({ params }: PageProps) {
+  const { id } = await params;
+  const task = await getTask(id);
+  return &lt;TaskDetail task={task} /&gt;;
+}</code></pre>
+          </section>
+
+          <section>
+            <h2>SearchParams tipado</h2>
+            <pre><code class="language-typescript">interface PageSearchParams {
+  searchParams: Promise<{ page?: string; filter?: string }>;
+}
+
+export default async function TasksPage({ searchParams }: PageSearchParams) {
+  const { page, filter } = await searchParams;
+  // ...
+}</code></pre>
+          </section>
+
+          <section>
+            <h2>Lab: Tipar Server Components</h2>
+            <div class="block-info">
+              <p><strong>Objetivo:</strong> Crear Server Components con tipos correctos</p>
+            </div>
+            <ol>
+              <li class="fragment">Crear página con params tipados</li>
+              <li class="fragment">Añadir searchParams</li>
+              <li class="fragment">Verificar sin errores de TypeScript</li>
+            </ol>
+          </section>
+        </section>
+
+        <!-- SECCION 7: Data Fetching con Tipos -->
+        <section>
+          <section class="section-divider">
+            <h1>7. Data Fetching con Tipos</h1>
+            <p>15 minutos</p>
+          </section>
+
+          <section>
+            <h2>Fetch tipado + Zod</h2>
+            <pre><code class="language-typescript">import { z } from 'zod';
+
+const TaskSchema = z.object({
+  id: z.number(),
+  title: z.string(),
+  status: z.enum(['pending', 'completed']),
+});
+
+type Task = z.infer&lt;typeof TaskSchema&gt;;
+
+async function getTasks(): Promise&lt;Task[]&gt; {
+  const res = await fetch('/api/tasks');
+  return res.json();
+}</code></pre>
+            <div class="block-info">
+              <p><strong>Beneficio:</strong> Un solo schema = tipos en frontend y backend</p>
+            </div>
+          </section>
+
+          <section>
+            <h2>Lab: Data Fetching Tipado con Zod</h2>
+            <div class="block-info">
+              <p><strong>Objetivo:</strong> Implementar fetch y API routes con tipos y validación Zod</p>
+            </div>
+            <ol>
+              <li class="fragment">Instalar Zod</li>
+              <li class="fragment">Crear tipos en types/task.ts</li>
+              <li class="fragment">Crear API route con validación</li>
+            </ol>
+          </section>
+        </section>
+
+        <!-- SECCION 8: Streaming y Suspense -->
+        <section>
+          <section class="section-divider">
+            <h1>8. Streaming y Suspense</h1>
+            <p>15 minutos</p>
+          </section>
+
+          <section>
+            <h2>Archivos especiales</h2>
+            <table>
+              <tr><th>Archivo</th><th>Cuando se muestra</th></tr>
+              <tr><td>loading.tsx</td><td>Mientras carga la página</td></tr>
+              <tr><td>error.tsx</td><td>Cuando hay error</td></tr>
+              <tr><td>not-found.tsx</td><td>Cuando notFound() es llamado</td></tr>
+            </table>
+          </section>
+
+          <section>
+            <h2>Suspense</h2>
+            <pre><code class="language-typescript">import { Suspense } from 'react';
+
+export default function Page() {
+  return (
+    &lt;Suspense fallback={&lt;Skeleton /&gt;}&gt;
+      &lt;TaskList /&gt;
+    &lt;/Suspense&gt;
+  );
+}</code></pre>
+          </section>
+
+          <section>
+            <h2>Lab: Implementar Streaming y Suspense</h2>
+            <div class="block-info">
+              <p><strong>Objetivo:</strong> Añadir loading, error, not-found y Suspense</p>
+            </div>
+            <ol>
+              <li class="fragment">Crear app/tasks/loading.tsx</li>
+              <li class="fragment">Crear app/tasks/error.tsx</li>
+              <li class="fragment">Crear app/tasks/not-found.tsx</li>
+            </ol>
+          </section>
+        </section>
+
+        <!-- SECCION 9: Metadata API -->
+        <section>
+          <section class="section-divider">
+            <h1>9. Metadata API</h1>
+            <p>10 minutos</p>
+          </section>
+
+          <section>
+            <h2>Metadata estática</h2>
+            <pre><code class="language-typescript">import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Task Manager',
+  description: 'Lista completa de tareas',
+  openGraph: {
+    title: 'Task Manager',
+    type: 'website',
+  },
+};</code></pre>
+          </section>
+
+          <section>
+            <h2>Metadata dinámica</h2>
+            <pre><code class="language-typescript">export async function generateMetadata({ params }: Props): Promise&lt;Metadata&gt; {
+  const { id } = await params;
+  const task = await getTask(id);
+  
+  return {
+    title: task ? `${task.title} - Task Manager` : 'Not found',
+  };
+}</code></pre>
+          </section>
+
+          <section>
+            <h2>Lab: Metadata API con Tipos</h2>
+            <div class="block-info">
+              <p><strong>Objetivo:</strong> Implementar metadata estática y dinámica</p>
+            </div>
+            <ol>
+              <li class="fragment">Añadir metadata en layout.tsx</li>
+              <li class="fragment">Añadir generateMetadata en páginas</li>
+              <li class="fragment">Verificar en DevTools</li>
+            </ol>
+          </section>
+        </section>
+
+        <!-- SECCION 10: API Routes Avanzados -->
+        <section>
+          <section class="section-divider">
+            <h1>10. API Routes Avanzados</h1>
+            <p>15 minutos</p>
+          </section>
+
+          <section>
+            <h2>Headers, Cookies y Query Params</h2>
+            <pre><code class="language-typescript">export async function GET(request: NextRequest) {
+  const authHeader = request.headers.get('authorization');
+  const sessionCookie = request.cookies.get('session');
+  const { searchParams } = new URL(request.url);
+  const page = searchParams.get('page');
+  
+  return NextResponse.json({ auth, session, page });
+}</code></pre>
+          </section>
+
+          <section>
+            <h2>Lab: API Routes Completos</h2>
+            <div class="block-info">
+              <p><strong>Objetivo:</strong> Crear API routes con headers, cookies, query params y validación</p>
+            </div>
+            <ol>
+              <li class="fragment">Crear app/api/tasks/route.ts</li>
+              <li class="fragment">Crear app/api/tasks/[id]/route.ts</li>
+              <li class="fragment">Probar endpoints</li>
+            </ol>
+          </section>
+        </section>
+
+        <!-- ======================= EJERCICIO INTEGRADOR ======================= -->
+        <section>
+          <section class="section-divider">
+            <h1>11. Ejercicio Integrador</h1>
+            <p>Migrar Caso 2r (Biblioteca) a Next.js SSR</p>
+          </section>
+          <section>
+            <h2>Requisitos</h2>
+            <ul>
+              <li>Crear proyecto Next.js con la app</li>
+              <li>Convertir componentes existentes a Server/Client Components</li>
+              <li>Migrar routing a estructura Next.js App Router</li>
+              <li>Crear páginas necesarias</li>
+              <li>Implementar API routes para CRUD</li>
+              <li>Configurar variables de entorno</li>
+            </ul>
+          </section>
+        </section>
+
+        <!-- ======================= RESUMEN ======================= -->
+        <section>
+          <section class="section-divider">
+            <h1>12. Resumen</h1>
+            <p>5 minutos</p>
+          </section>
+          <section>
+            <h2>Puntos Clave</h2>
+            <ol>
+              <li>Webpack NO hace SSR - solo empaqueta</li>
+              <li>SSR = Framework: Next.js, Remix, Astro</li>
+              <li>Server vs Client Components - Server por defecto, use client para interactividad</li>
+              <li>Routing - estructura de carpetas en app/</li>
+              <li>API Routes - crear endpoints sin backend separado</li>
+              <li>Tipado de Server Components - params como Promise, searchParams</li>
+              <li>Data Fetching - fetch tipado, Zod para validación</li>
+              <li>Streaming - Suspense, loading.tsx, error.tsx, not-found.tsx</li>
+              <li>Metadata API - SEO con tipos estáticos y dinámicos</li>
+              <li>API Routes avanzados - headers, cookies, query params con tipos</li>
+            </ol>
+          </section>
+        </section>
+
+        <!-- ======================= REFERENCIAS ======================= -->
+        <section>
+          <section class="section-divider">
+            <h1>13. Referencias</h1>
+          </section>
+          <section>
+            <h2>Recursos Adicionales</h2>
+            <ul>
+              <li><a href="https://nextjs.org/docs" target="_blank">Next.js Documentation</a></li>
+              <li><a href="https://nextjs.org/docs/app" target="_blank">Next.js App Router</a></li>
+              <li><a href="https://react.dev/blog/2023/03/23/react-server-components" target="_blank">React Server Components</a></li>
+              <li><a href="https://nextjs.org/docs/pages/building-your-application/rendering" target="_blank">SSR vs SSG</a></li>
+              <li><a href="https://nextjs.org/docs/app/building-your-application/optimizing/metadata" target="_blank">Next.js Metadata API</a></li>
+              <li><a href="https://zod.dev" target="_blank">Zod Validation</a></li>
+            </ul>
+          </section>
+        </section>
+
+        <!-- ======================= GRACIAS ======================= -->
+        <section class="slide-title">
+          <img src="./imgs/axia_logo.png" class="logo" alt="" />
+          <h1>Gracias!</h1>
+          <h2>Anexo 5A Completado</h2>
+          <p class="small-text">Siguiente: Anexo 8A - Patrones TS Avanzados</p>
+        </section>
+      </div>
+    </div>
+
+    <!-- Reveal.js 5.2 -->
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.2.0/dist/reveal.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.2.0/plugin/notes/notes.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.2.0/plugin/markdown/markdown.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.2.0/plugin/highlight/highlight.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.2.0/plugin/zoom/zoom.js"></script>
+
+    <script>
+      // Inicializar Reveal.js
+      Reveal.initialize({
+        hash: true,
+        slideNumber: "c/t",
+        showSlideNumber: "all",
+        progress: true,
+        history: true,
+        center: true,
+        transition: "slide",
+        transitionSpeed: "default",
+        backgroundTransition: "fade",
+        width: 1280,
+        height: 720,
+        margin: 0.1,
+        pdfSeparateFragments: false, 
+
+        // Plugins
+        plugins: [RevealNotes, RevealMarkdown, RevealHighlight, RevealZoom],
+      });
+    </script>
+  </body>
+</html>

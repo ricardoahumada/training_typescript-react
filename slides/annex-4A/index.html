@@ -1,0 +1,505 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Anexo 4A: Tipos en React</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Lato:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Reveal.js 5.2 CSS -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/reveal.js@5.2.0/dist/reset.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/reveal.js@5.2.0/dist/reveal.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/reveal.js@5.2.0/dist/theme/white.css"
+    />
+
+    <!-- Highlight.js para codigo -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/reveal.js@5.2.0/plugin/highlight/monokai.css"
+    />
+
+    <!-- CSS Personalizado -->
+    <link rel="stylesheet" href="css/custom.css" />
+  </head>
+  <body>
+    <div class="reveal">
+      <div class="slides">
+        <!-- ======================= PORTADA ======================= -->
+        <section class="slide-title">
+          <img src="./imgs/axia_logo.png" class="logo" alt="" />
+          <h1>Anexo 4A</h1>
+          <h2>Tipos en React (JSX → TSX)</h2>
+          <p class="small-text">Curso: TypeScript</p>
+          <div style="margin-top: 40px">
+            <span class="badge badge-primary">150 min</span>
+          </div>
+        </section>
+
+        <!-- ======================= OBJETIVOS ======================= -->
+        <section>
+          <h2>Objetivos de Aprendizaje</h2>
+          <h3>Parte 1 - Tipos Avanzados de TypeScript:</h3>
+          <ul>
+            <li>Aplicar Utility Types (Partial, Omit, Pick, Record)</li>
+            <li>Implementar Generic Constraints con extends</li>
+            <li>Utilizar Template Literal Types</li>
+            <li>Aplicar Mapped Types</li>
+            <li>Comprender Type Inference</li>
+            <li>Usar el operador satisfies</li>
+          </ul>
+          <h3>Parte 2 - React + TypeScript:</h3>
+          <ul>
+            <li>Migrar componentes de JSX a TSX</li>
+            <li>Tipar props y children (ReactNode)</li>
+            <li>Tipar state con useState&lt;T&gt;</li>
+            <li>Tipar eventos de formulario</li>
+            <li>Usar hooks con tipos (useRef, useCallback, useMemo)</li>
+            <li>Crear componentes genéricos con constraints</li>
+            <li>Aplicar React 18 con useId</li>
+          </ul>
+        </section>
+
+        <!-- ======================= SECCIONES ======================= -->
+
+        <!-- SECCION 1: Contexto -->
+        <section>
+          <section class="section-divider">
+            <h1>1. Contexto: Tipos avanzados</h1>
+            <p>15 minutos</p>
+          </section>
+          <section>
+            <h2>El problema: Tipos inflexibles</h2>
+            <pre><code class="language-typescript">interface Task {
+  id: string;
+  title: string;
+  status: 'pending' | 'inProgress' | 'completed';
+}
+
+// ¿Cómo creo un tipo para tarea PARCIALMENTE editable?
+// ¿Cómo creo un tipo sin el campo id?
+// ¿Cómo creo un tipo solo con los campos de búsqueda?</code></pre>
+          </section>
+          <section>
+            <h2>Solución: Utility Types</h2>
+            <pre><code class="language-typescript">type TaskPartial = Partial&lt;Task&gt;;     // Todos los campos opcionales
+type TaskSinId = Omit&lt;Task, 'id'&gt;;    // Sin el campo id
+type TaskPreview = Pick&lt;Task, 'id' | 'title'&gt;; // Solo algunos campos
+type TaskMap = Record&lt;string, Task&gt;;  // Objeto con claves string</code></pre>
+          </section>
+        </section>
+
+        <!-- SECCION 2: Utility Types -->
+        <section>
+          <section class="section-divider">
+            <h1>2. Utility Types</h1>
+            <p>25 minutos</p>
+          </section>
+          <section>
+            <h2>Partial, Required, Omit, Pick</h2>
+            <table>
+              <tr><th>Utility</th><th>Uso</th></tr>
+              <tr><td>Partial&lt;T&gt;</td><td>Todos los campos opcionales</td></tr>
+              <tr><td>Required&lt;T&gt;</td><td>Todos los campos obligatorios</td></tr>
+              <tr><td>Omit&lt;T, K&gt;</td><td>Excluir campos</td></tr>
+              <tr><td>Pick&lt;T, K&gt;</td><td>Seleccionar campos</td></tr>
+              <tr><td>Record&lt;K,V&gt;</td><td>Índice/Map</td></tr>
+            </table>
+          </section>
+          <section>
+            <h2>Lab: Utility Types</h2>
+            <ol>
+              <li class="fragment">Crear tipo para formulario de edición (Partial)</li>
+              <li class="fragment">Crear tipo para respuesta sin id (Omit)</li>
+              <li class="fragment">Crear índice de tareas por prioridad (Record)</li>
+            </ol>
+          </section>
+        </section>
+
+        <!-- SECCION 3: Generic Constraints -->
+        <section>
+          <section class="section-divider">
+            <h1>3. Generic Constraints</h1>
+            <p>20 minutos</p>
+          </section>
+          <section>
+            <h2>extends para limitar genéricos</h2>
+            <pre><code class="language-typescript">function getProp&lt;T, K extends keyof T&gt;(obj: T, key: K): T[K] {
+  return obj[key];
+}
+
+const task = { title: 'Learn TS', priority: 'high' };
+getProp(task, 'title');    // ✅ string
+getProp(task, 'priority'); // ✅ string
+getProp(task, 'status');   // ❌ Error: no existe</code></pre>
+          </section>
+          <section>
+            <h2>Lab: Generic Constraints</h2>
+            <ol>
+              <li class="fragment">Crear componente genérico con constraint</li>
+              <li class="fragment">Usar extends para asegurar que tiene id</li>
+            </ol>
+          </section>
+        </section>
+
+        <!-- SECCION 4: Template Literal Types -->
+        <section>
+          <section class="section-divider">
+            <h1>4. Template Literal Types</h1>
+            <p>15 minutos</p>
+          </section>
+          <section>
+            <h2>Crear tipos de strings específicas</h2>
+            <pre><code class="language-typescript">type APIRoute = `/api/${string}`;
+const taskRoute: APIRoute = '/api/tasks'; // ✅
+const invalid: APIRoute = '/other';       // ❌
+
+type TaskEvent = 'onClick' | 'onSubmit';
+type Handler = { [K in TaskEvent]?: () => void };</code></pre>
+          </section>
+          <section>
+            <h2>Lab: Template Literal Types</h2>
+            <ol>
+              <li class="fragment">Tipar acciones de tareas</li>
+              <li class="fragment">Crear tipos para eventos</li>
+            </ol>
+          </section>
+        </section>
+
+        <!-- SECCION 5: Mapped Types -->
+        <section>
+          <section class="section-divider">
+            <h1>5. Mapped Types</h1>
+            <p>15 minutos</p>
+          </section>
+          <section>
+            <h2>Transformar tipos automáticamente</h2>
+            <pre><code class="language-typescript">type Readonly&lt;T&gt; = { readonly [K in keyof T]: T[K] };
+type Optional&lt;T&gt; = { [K in keyof T]?: T[K] };
+type Nullable&lt;T&gt; = { [K in keyof T]: T[K] | null };</code></pre>
+          </section>
+          <section>
+            <h2>Lab: Mapped Types</h2>
+            <ol>
+              <li class="fragment">Hacer todos los campos opcionales</li>
+              <li class="fragment">Agregar prefijos</li>
+            </ol>
+          </section>
+        </section>
+
+        <!-- SECCION 6: Type Inference -->
+        <section>
+          <section class="section-divider">
+            <h1>6. Type Inference</h1>
+            <p>10 minutos</p>
+          </section>
+          <section>
+            <h2>Inferencia en funciones</h2>
+            <pre><code class="language-typescript">// TS infiere el tipo de retorno
+function getTask() {
+  return { id: '1', title: 'Learn TS' };
+}
+// Infiere: { id: string; title: string }
+
+// as const - preservar literales
+const colors = ['red', 'blue'] as const;
+// readonly ['red', 'blue']</code></pre>
+          </section>
+        </section>
+
+        <!-- SECCION 7: Satisfies -->
+        <section>
+          <section class="section-divider">
+            <h1>7. Satisfies Operator</h1>
+            <p>10 minutos</p>
+          </section>
+          <section>
+            <h2>satisfies vs as</h2>
+            <pre><code class="language-typescript">// as - pierde literal
+const c1 = 'debug' as string; // c1: string
+
+// satisfies - mantiene literal + valida
+const c2 = 'debug' satisfies 'debug' | 'info' | 'error';
+// c2: 'debug' (literal)</code></pre>
+          </section>
+        </section>
+
+        <!-- EJERCICIO INTEGRADOR 1 -->
+        <section>
+          <section class="section-divider">
+            <h1>Ejercicio Integrador - Parte 1</h1>
+            <p>Aplicar conceptos al Caso 2r (Biblioteca)</p>
+          </section>
+          <section>
+            <h2>Requisitos</h2>
+            <ul>
+              <li>Utility Types: Partial, Omit, Pick</li>
+              <li>Generic Constraints con extends</li>
+              <li>Template Literal Types</li>
+              <li>Mapped Types</li>
+              <li>Satisfies</li>
+            </ul>
+          </section>
+        </section>
+
+        <!-- SECCION 8: Migración JSX → TSX -->
+        <section>
+          <section class="section-divider">
+            <h1>8. Migración JSX → TSX</h1>
+            <p>15 minutos</p>
+          </section>
+          <section>
+            <h2>De JSX a TSX</h2>
+            <pre><code class="language-typescript">// TSX - con tipos explícitos
+interface BookCardProps {
+  titulo: string;
+  autor: string;
+  año?: number;
+}
+
+function BookCard({ titulo, autor, año }: BookCardProps) {
+  return (
+    &lt;div&gt;
+      &lt;h3&gt;{titulo}&lt;/h3&gt;
+      &lt;p&gt;{autor} {año && `- ${año}`}&lt;/p&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+          </section>
+        </section>
+
+        <!-- SECCION 9: Tipado de Props y Children -->
+        <section>
+          <section class="section-divider">
+            <h1>9. Tipado de Props y Children</h1>
+            <p>15 minutos</p>
+          </section>
+          <section>
+            <h2>Props con Children</h2>
+            <pre><code class="language-typescript">import { ReactNode } from 'react';
+
+interface CardProps {
+  title: string;
+  children: ReactNode;
+  footer?: ReactNode;
+}</code></pre>
+          </section>
+          <section>
+            <h2>ReactNode vs otros tipos</h2>
+            <table>
+              <tr><th>Tipo</th><th>Qué acepta</th></tr>
+              <tr><td>ReactNode</td><td>Todo</td></tr>
+              <tr><td>ReactElement</td><td>Solo elementos JSX</td></tr>
+              <tr><td>string</td><td>Solo texto</td></tr>
+            </table>
+          </section>
+        </section>
+
+        <!-- SECCION 10: Tipado de State -->
+        <section>
+          <section class="section-divider">
+            <h1>10. Tipado de State</h1>
+            <p>15 minutos</p>
+          </section>
+          <section>
+            <h2>useState con genéricos</h2>
+            <pre><code class="language-typescript">// Inferencia automática
+const [task, setTask] = useState({ title: 'Learn' });
+
+// Explícito
+const [tasks, setTasks] = useState&lt;Task[]&gt;([]);
+const [task, setTask] = useState&lt;Task | null&gt;(null);</code></pre>
+          </section>
+        </section>
+
+        <!-- SECCION 11: Tipado de Eventos -->
+        <section>
+          <section class="section-divider">
+            <h1>11. Tipado de Eventos</h1>
+            <p>15 minutos</p>
+          </section>
+          <section>
+            <h2>Eventos de formulario</h2>
+            <pre><code class="language-typescript">// Input change
+onChange={(e) => setValue(e.target.value)}
+// e: ChangeEvent&lt;HTMLInputElement&gt;
+
+// Form submit
+onSubmit={(e) => e.preventDefault()}
+// e: FormEvent&lt;HTMLFormElement&gt;</code></pre>
+          </section>
+        </section>
+
+        <!-- SECCION 12: Hooks Básicos Tipados -->
+        <section>
+          <section class="section-divider">
+            <h1>12. Hooks Básicos Tipados</h1>
+            <p>15 minutos</p>
+          </section>
+          <section>
+            <h2>useRef, useCallback, useMemo</h2>
+            <pre><code class="language-typescript">// useRef
+const inputRef = useRef&lt;HTMLInputElement&gt;(null);
+
+// useCallback
+const handleClick = useCallback(() => { ... }, []);
+
+// useMemo
+const filtered = useMemo(() => tasks.filter(...), [tasks]);</code></pre>
+          </section>
+        </section>
+
+        <!-- SECCION 13: Componentes Genéricos -->
+        <section>
+          <section class="section-divider">
+            <h1>13. Componentes Genéricos</h1>
+            <p>15 minutos</p>
+          </section>
+          <section>
+            <h2>Componentes con tipo genérico</h2>
+            <pre><code class="language-typescript">interface ListProps&lt;T&gt; {
+  items: T[];
+  renderItem: (item: T) => ReactNode;
+}
+
+function List&lt;T&gt;({ items, renderItem }: ListProps&lt;T&gt;) {
+  return &lt;ul&gt;{items.map(renderItem)}&lt;/ul&gt;;
+}</code></pre>
+          </section>
+        </section>
+
+        <!-- SECCION 14: IDs Únicos -->
+        <section>
+          <section class="section-divider">
+            <h1>14. IDs Únicos en Componentes</h1>
+            <p>10 minutos</p>
+          </section>
+          <section>
+            <h2>useId para accesibilidad y SSR</h2>
+            <pre><code class="language-typescript">const id = useId();
+return (
+  &lt;div&gt;
+    &lt;label htmlFor={id}&gt;Nombre&lt;/label&gt;
+    &lt;input id={id} /&gt;
+  &lt;/div&gt;
+);</code></pre>
+          </section>
+        </section>
+
+        <!-- ======================= EJERCICIO INTEGRADOR 2 ======================= -->
+        <section>
+          <section class="section-divider">
+            <h1>Ejercicio Integrador - Parte 2</h1>
+            <p>Componentes React Tipados - Caso 2r</p>
+          </section>
+          <section>
+            <h2>Requisitos</h2>
+            <ul>
+              <li>BookCard: props tipadas con children</li>
+              <li>BookList: componente genérico</li>
+              <li>LoanForm: eventos tipados</li>
+              <li>useState, useRef, useCallback</li>
+              <li>useId para accesibilidad</li>
+            </ul>
+          </section>
+        </section>
+
+        <!-- ======================= RESUMEN ======================= -->
+        <section>
+          <section class="section-divider">
+            <h1>15. Resumen</h1>
+            <p>5 minutos</p>
+          </section>
+          <section>
+            <h2>Puntos Clave</h2>
+            <ol>
+              <li><strong>Utility Types:</strong> Partial, Omit, Pick, Record</li>
+              <li><strong>Generic Constraints:</strong> extends para limitar tipos</li>
+              <li><strong>Template Literal Types:</strong> `${}` para strings</li>
+              <li><strong>Mapped Types:</strong> [K in keyof T]</li>
+              <li><strong>Type Inference:</strong> Cómo TS infiere tipos</li>
+              <li><strong>Satisfies:</strong> Validar sin perder literales</li>
+              <li><strong>JSX → TSX:</strong> Migración de componentes</li>
+              <li><strong>Props y Children:</strong> ReactNode</li>
+              <li><strong>State:</strong> useState&lt;T&gt;</li>
+              <li><strong>Eventos:</strong> ChangeEvent, FormEvent</li>
+              <li><strong>Hooks:</strong> useRef, useCallback, useMemo</li>
+              <li><strong>Componentes Genéricos:</strong> &lt;T&gt; con constraints</li>
+              <li><strong>useId:</strong> IDs únicos para accesibilidad</li>
+            </ol>
+          </section>
+        </section>
+
+        <!-- ======================= REFERENCIAS ======================= -->
+        <section>
+          <section class="section-divider">
+            <h1>16. Referencias</h1>
+          </section>
+          <section>
+            <h2>Recursos Adicionales</h2>
+            <ul>
+              <li><a href="https://www.typescriptlang.org/docs/handbook/utility-types.html" target="_blank">TypeScript Utility Types</a></li>
+              <li><a href="https://www.typescriptlang.org/docs/handbook/2/generics.html" target="_blank">TypeScript Generics</a></li>
+              <li><a href="https://www.typescriptlang.org/docs/handbook/2/template-literal-types.html" target="_blank">Template Literal Types</a></li>
+              <li><a href="https://www.typescriptlang.org/docs/handbook/release-notes/typescript-4-9.html" target="_blank">satisfies Operator</a></li>
+              <li><a href="https://react-typescript-cheatsheet.netlify.app/" target="_blank">React TypeScript Cheatsheet</a></li>
+              <li><a href="https://react.dev/learn/typescript" target="_blank">React 18 with TypeScript</a></li>
+              <li><a href="https://react.dev/reference/react/useId" target="_blank">useId Hook</a></li>
+            </ul>
+          </section>
+        </section>
+
+        <!-- ======================= GRACIAS ======================= -->
+        <section class="slide-title">
+          <img src="./imgs/axia_logo.png" class="logo" alt="" />
+          <h1>Gracias!</h1>
+          <h2>Anexo 4A Completado</h2>
+          <p class="small-text">Siguiente: Anexo 5A - SSR</p>
+        </section>
+      </div>
+    </div>
+
+    <!-- Reveal.js 5.2 -->
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.2.0/dist/reveal.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.2.0/plugin/notes/notes.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.2.0/plugin/markdown/markdown.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.2.0/plugin/highlight/highlight.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.2.0/plugin/zoom/zoom.js"></script>
+
+    <script>
+      // Inicializar Reveal.js
+      Reveal.initialize({
+        hash: true,
+        slideNumber: "c/t",
+        showSlideNumber: "all",
+        progress: true,
+        history: true,
+        center: true,
+        transition: "slide",
+        transitionSpeed: "default",
+        backgroundTransition: "fade",
+        width: 1280,
+        height: 720,
+        margin: 0.1,
+        pdfSeparateFragments: false, 
+
+        // Plugins
+        plugins: [RevealNotes, RevealMarkdown, RevealHighlight, RevealZoom],
+      });
+    </script>
+  </body>
+</html>

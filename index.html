@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Training TypeScript + React</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            color: #fff;
+            padding: 2rem;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 {
+            text-align: center;
+            margin-bottom: 0.5rem;
+            font-size: 2.5rem;
+            color: #3178c6;
+        }
+        .subtitle {
+            text-align: center;
+            color: #888;
+            margin-bottom: 3rem;
+            font-size: 1.1rem;
+        }
+        h2 {
+            color: #3178c6;
+            margin: 2rem 0 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #3178c6;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        .card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-decoration: none;
+            color: #fff;
+            transition: transform 0.2s, background 0.2s;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .card:hover {
+            transform: translateY(-3px);
+            background: rgba(255,255,255,0.1);
+            border-color: #3178c6;
+        }
+        .card-title { font-weight: 600; margin-bottom: 0.5rem; }
+        .card-label {
+            font-size: 0.8rem;
+            color: #3178c6;
+            text-transform: uppercase;
+        }
+        .annexes { margin-top: 3rem; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Training TypeScript + React</h1>
+        <p class="subtitle">Presentaciones y materiales de curso</p>
+
+        <h2>Módulos</h2>
+        <div class="grid">
+            <a class="card" href="slides/module-01/"><div class="card-label">01</div><div class="card-title">Introducción a TypeScript</div></a>
+            <a class="card" href="slides/module-02/"><div class="card-label">02</div><div class="card-title">Módulo 2</div></a>
+            <a class="card" href="slides/module-03/"><div class="card-label">03</div><div class="card-title">Módulo 3</div></a>
+            <a class="card" href="slides/module-04/"><div class="card-label">04</div><div class="card-title">Módulo 4</div></a>
+            <a class="card" href="slides/module-05/"><div class="card-label">05</div><div class="card-title">Módulo 5</div></a>
+            <a class="card" href="slides/module-06/"><div class="card-label">06</div><div class="card-title">Módulo 6</div></a>
+            <a class="card" href="slides/module-07/"><div class="card-label">07</div><div class="card-title">Módulo 7</div></a>
+            <a class="card" href="slides/module-08/"><div class="card-label">08</div><div class="card-title">Módulo 8</div></a>
+            <a class="card" href="slides/module-09/"><div class="card-label">09</div><div class="card-title">Módulo 9</div></a>
+            <a class="card" href="slides/module-10/"><div class="card-label">10</div><div class="card-title">Módulo 10</div></a>
+            <a class="card" href="slides/module-11/"><div class="card-label">11</div><div class="card-title">Módulo 11</div></a>
+            <a class="card" href="slides/module-12/"><div class="card-label">12</div><div class="card-title">Módulo 12</div></a>
+        </div>
+
+        <div class="annexes">
+            <h2>Anexos</h2>
+            <div class="grid">
+                <a class="card" href="slides/annex-3A/"><div class="card-label">3A</div><div class="card-title">Webpack + TSX</div></a>
+                <a class="card" href="slides/annex-4A/"><div class="card-label">4A</div><div class="card-title">Anexo 4A</div></a>
+                <a class="card" href="slides/annex-5A/"><div class="card-label">5A</div><div class="card-title">Anexo 5A</div></a>
+                <a class="card" href="slides/annex-8A/"><div class="card-label">8A</div><div class="card-title">Anexo 8A</div></a>
+                <a class="card" href="slides/annex-12A/"><div class="card-label">12A</div><div class="card-title">Anexo 12A</div></a>
+                <a class="card" href="slides/annex-12B/"><div class="card-label">12B</div><div class="card-title">Anexo 12B</div></a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
