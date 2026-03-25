@@ -59,3 +59,13 @@ enum Priority {
 }
 
 let taskPriority: Priority = Priority.High;
+
+/* TIPOS ESPECIALES */
+
+let ric: { nombre: string; edad: number } | null = null;
+let ana: { nombre: string; edad: number } & {edad:35} = {nombre: "ana", edad: 35};
+
+function userManager(usuario: { nombre?: string }): void {
+  const nombre = usuario.nombre;
+  if (nombre != null) console.log(nombre.toLocaleUpperCase());
+}
