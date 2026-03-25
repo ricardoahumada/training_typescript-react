@@ -1,17 +1,15 @@
 {
-  "name": "caso2-template",
+  "name": "biblioteca-solution",
   "version": "1.0.0",
-  "description": "Template Caso 2: Sistema de Biblioteca",
+  "description": "Solución ejercicio integrador - Sistema de Biblioteca",
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
-    "watch": "tsc --watch",
     "start": "node dist/index.js"
   },
-  "keywords": ["typescript", "template"],
-  "author": "",
-  "license": "ISC",
+  "dependencies": {},
   "devDependencies": {
-    
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
   }
 }
