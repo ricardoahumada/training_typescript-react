@@ -149,16 +149,42 @@ export default defineConfig({
 
           <section>
             <h2>Lab: Configurar Playwright</h2>
-            <div class="block-info">
-              <p><strong>Objetivo:</strong> Configurar entorno de testing E2E</p>
-            </div>
-            <ol>
-              <li class="fragment">Instalar Playwright con TypeScript</li>
-              <li class="fragment">Configurar playwright.config.ts</li>
-              <li class="fragment">Crear estructura de carpetas</li>
-              <li class="fragment">Agregar scripts al package.json</li>
-              <li class="fragment">Ejecutar test inicial</li>
-            </ol>
+            <pre><code class="language-typescript">// 1. Instalar Playwright
+// npm init playwright@latest -- --lang=TypeScript
+// npm install -D @playwright/test
+
+// 2. playwright.config.ts
+import { defineConfig, devices } from '@playwright/test';
+
+export default defineConfig({
+  testDir: './e2e',
+  fullyParallel: true,
+  forbidOnly: !!process.env.CI,
+  retries: process.env.CI ? 2 : 0,
+  use: {
+    baseURL: 'http://localhost:3000',
+    trace: 'on-first-retry',
+  },
+  projects: [
+    { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
+  ],
+  webServer: {
+    command: 'npm run dev',
+    url: 'http://localhost:3000',
+    reuseExistingServer: !process.env.CI,
+  },
+});
+
+// 3. Estructura de carpetas
+// e2e/
+// ├── flows/
+// ├── pages/
+// ├── fixtures/
+// └── utils/
+
+// 4. package.json scripts
+// "test:e2e": "playwright test",
+// "test:e2e:ui": "playwright test --ui"</code></pre>
           </section>
 
         </section>
@@ -217,15 +243,39 @@ expect.extend({
 
           <section>
             <h2>Lab: Fixtures y Matchers Tipados</h2>
-            <div class="block-info">
-              <p><strong>Objetivo:</strong> Implementar fixtures y matchers personalizados</p>
-            </div>
-            <ol>
-              <li class="fragment">Crear archivo de fixtures</li>
-              <li class="fragment">Definir tipos para auth</li>
-              <li class="fragment">Crear matchers personalizados</li>
-              <li class="fragment">Usar en tests</li>
-            </ol>
+            <pre><code class="language-typescript">// e2e/fixtures/tasks.fixtures.ts
+import { test as base, Page } from '@playwright/test';
+
+interface TaskFixtures {
+  mockApiTasks: (tasks: Task[]) => Promise<void>;
+  paginaTareas: Page;
+}
+
+interface Task {
+  id: string;
+  title: string;
+  status: 'pending' | 'completed';
+}
+
+export const test = base.extend<TaskFixtures>({
+  mockApiTasks: async ({ page }, use) => {
+    await use(async (tasks: Task[]) => {
+      await page.route('/api/tasks', route =>
+        route.fulfill({ json: tasks })
+      );
+    });
+  },
+});
+
+// e2e/matchers/task.matchers.ts
+expect.extend({
+  async toHaveTask(received: Locator, title: string) {
+    const task = received.locator('[data-testid="task"]').filter({ hasText: title });
+    return (await task.count()) > 0
+      ? { pass: true, message: () => '' }
+      : { pass: false, message: () => `Task "${title}" not found` };
+  },
+});</code></pre>
           </section>
         </section>
 
@@ -288,14 +338,36 @@ page.getByLabel('Nombre del libro');</code></pre>
 
           <section>
             <h2>Lab: Page Objects para el Caso 1r</h2>
-            <div class="block-info">
-              <p><strong>Objetivo:</strong> Implementar Page Objects tipados</p>
-            </div>
-            <ol>
-              <li class="fragment">Crear ListadoLibrosPage</li>
-              <li class="fragment">Crear ModalConfirmacionPage</li>
-              <li class="fragment">Crear test de flujo</li>
-            </ol>
+            <pre><code class="language-typescript">// e2e/pages/TareasPage.ts
+export class TareasPage {
+  constructor(private page: Page) {}
+
+  async goto(): Promise&lt;void&gt; {
+    await this.page.goto('/tareas');
+  }
+
+  async agregarTarea(titulo: string): Promise&lt;void&gt; {
+    await this.page.fill('[data-testid="input-tarea"]', titulo);
+    await this.page.click('[data-testid="btn-agregar"]');
+  }
+
+  async completarTarea(titulo: string): Promise&lt;void&gt; {
+    const tarea = this.page.locator('[data-testid="tarea"]').filter({ hasText: titulo });
+    await tarea.locator('[data-testid="btn-completar"]').click();
+  }
+}
+
+// e2e/flows/prestamo-tarea.spec.ts
+import { test, expect } from '@playwright/test';
+import { TareasPage } from '../pages/TareasPage';
+
+test('completar flujo de tarea', async ({ page }) => {
+  const tareasPage = new TareasPage(page);
+  await tareasPage.goto();
+  await tareasPage.agregarTarea('Learn TypeScript');
+  await tareasPage.completarTarea('Learn TypeScript');
+  await expect(page.locator('[data-testid="mensaje-exito"]')).toBeVisible();
+});</code></pre>
           </section>
         </section>
 
@@ -385,15 +457,30 @@ test('layout responsive', async ({ page }) => {
 
           <section>
             <h2>Lab: Visual Regression</h2>
-            <div class="block-info">
-              <p><strong>Objetivo:</strong> Configurar y ejecutar tests de regression visual</p>
-            </div>
-            <ol>
-              <li class="fragment">Habilitar screenshots en config</li>
-              <li class="fragment">Ejecutar test inicial para baseline</li>
-              <li class="fragment">Modificar un componente UI</li>
-              <li class="fragment">Ejecutar tests para ver diferencias</li>
-            </ol>
+            <pre><code class="language-typescript">// 1. Habilitar screenshots en playwright.config.ts
+export default defineConfig({
+  use: { screenshot: 'only-on-failure' },
+});
+
+// 2. Generar baseline
+// npx playwright test --update-snapshots
+
+// 3. Test de regression visual
+test('tareas - baseline', async ({ page }) => {
+  await page.goto('/tareas');
+  await expect(page).toHaveScreenshot('tareas-list.png');
+});
+
+// 4. Test con theming
+test('tareas - dark mode', async ({ page }) => {
+  await page.emulateMedia({ colorScheme: 'dark' });
+  await page.goto('/tareas');
+  await expect(page).toHaveScreenshot('tareas-dark.png');
+});
+
+// 5. Ver diferencias
+// npx playwright test
+// Las diferencias aparecerán en playwright-report/</code></pre>
           </section>
         </section>
 
@@ -436,14 +523,32 @@ await page.route('/api/libros', async route => {
 
           <section>
             <h2>Lab: Stubbing de API</h2>
-            <div class="block-info">
-              <p><strong>Objetivo:</strong> Configurar mocks para tests deterministas</p>
-            </div>
-            <ol>
-              <li class="fragment">Crear clase MockApi</li>
-              <li class="fragment">Crear fixture para usar en tests</li>
-              <li class="fragment">Usar en tests</li>
-            </ol>
+            <pre><code class="language-typescript">// e2e/utils/mock-api.ts
+export class MockApi {
+  constructor(private page: Page) {}
+
+  async stubLibros(libros: Libro[]) {
+    await this.page.route('/api/libros', route =>
+      route.fulfill({ status: 200, json: libros })
+    );
+  }
+
+  async stubErrorRed() {
+    await this.page.route('/api/**', route => route.abort('failed'));
+  }
+}
+
+// e2e/fixtures/api.fixture.ts
+export const test = base.extend<{ mockApi: MockApi }>({
+  mockApi: async ({ page }, use) => await use(new MockApi(page)),
+});
+
+// Uso en tests
+test('mostrar libros con mock', async ({ page, mockApi }) => {
+  await mockApi.stubLibros([{ id: '1', titulo: 'Test', disponible: true }]);
+  await page.goto('/libros');
+  await expect(page.locator('[data-testid="libro-card"]')).toBeVisible();
+});</code></pre>
           </section>
         </section>
 
@@ -522,15 +627,62 @@ test('usuario autenticado puede prestar libros', async ({ page }) => {
 
           <section>
             <h2>Lab: Testear Next.js del Caso 1r</h2>
-            <div class="block-info">
-              <p><strong>Objetivo:</strong> Escribir tests E2E para Next.js</p>
-            </div>
-            <ol>
-              <li class="fragment">Verificar contenido SSR</li>
-              <li class="fragment">Testear API routes</li>
-              <li class="fragment">Testear streaming</li>
-              <li class="fragment">Testear autenticación</li>
-            </ol>
+            <pre><code class="language-typescript">// Test 1: Contenido SSR
+test('contenido SSR presente', async ({ page }) => {
+  await page.goto('/tareas');
+  const html = await page.content();
+  expect(html).toContain('Tareas');
+});
+
+// Test 2: API Routes
+test('API de tareas funciona', async ({ request }) => {
+  const response = await request.get('/api/tasks');
+  expect(response.ok()).toBeTruthy();
+});
+
+// Test 3: Streaming SSR
+test('contenido carga progresivamente', async ({ page }) => {
+  await page.goto('/tareas');
+  await expect(page.locator('h1')).toContainText('Tareas', { timeout: 5000 });
+  await expect(page.locator('[data-testid="task"]').first()).toBeVisible({ timeout: 15000 });
+});
+
+// Test 4: Autenticación con cookies
+test('acceso con sesión', async ({ page }) => {
+  await page.context().addCookies([{
+    name: 'auth-token', value: 'mock-token', domain: 'localhost', path: '/'
+  }]);
+  await page.goto('/tareas');
+  await expect(page.locator('[data-testid="btn-agregar"]')).toBeEnabled();
+});</code></pre>
+          </section>
+
+          <section>
+            <h2>Lab: Testing Avanzado de SSR</h2>
+            <pre><code class="language-typescript">// Test: ISR (Incremental Static Regeneration)
+test('página se regenera correctamente', async ({ request }) => {
+  const response = await request.get('/api/revalidate?path=/tareas');
+  expect(response.ok()).toBeTruthy();
+});
+
+// Test: Streaming con Suspense
+test('muestra fallback mientras carga', async ({ page }) => {
+  await page.goto('/tareas');
+  const skeleton = page.locator('[data-testid="loading-skeleton"]');
+  await expect(skeleton).toBeVisible();
+  await expect(skeleton).toBeHidden({ timeout: 10000 });
+});
+
+// Test: Login y persistencia de sesión
+test('login y persistencia', async ({ page }) => {
+  await page.goto('/login');
+  await page.fill('[name="email"]', 'user@test.com');
+  await page.fill('[name="password"]', 'password123');
+  await page.click('[type="submit"]');
+  await expect(page).toHaveURL('/');
+  const cookies = await page.context().cookies();
+  expect(cookies.find(c => c.name === 'auth-token')).toBeDefined();
+});</code></pre>
           </section>
         </section>
 

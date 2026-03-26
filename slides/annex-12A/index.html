@@ -179,16 +179,39 @@ afterEach(() => {
 
           <section>
             <h2>Lab 1: Configurar Vitest</h2>
-            <div class="block-info">
-              <p><strong>Objetivo:</strong> Configurar entorno de testing determinista</p>
-            </div>
-            <ol>
-              <li class="fragment">Instalar dependencias de testing</li>
-              <li class="fragment">Crear archivo vitest.config.ts</li>
-              <li class="fragment">Configurar jsdom con opciones de aislamiento</li>
-              <li class="fragment">Crear setup.ts con cleanup automático</li>
-              <li class="fragment">Agregar scripts al package.json</li>
-            </ol>
+            <pre><code class="language-typescript">// 1. Instalar dependencias
+// npm install -D vitest @testing-library/react @testing-library/jest-dom jsdom
+
+// 2. vite.config.ts
+import { defineConfig } from 'vitest/config';
+import react from '@vitejs/plugin-react';
+
+export default defineConfig({
+  plugins: [react()],
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: './src/test/setup.ts',
+    isolate: true,
+    fakeTimers: { enableGlobically: ['setTimeout', 'setInterval'] },
+    coverage: { provider: 'v8', reporter: ['text', 'json', 'html'] }
+  }
+});
+
+// 3. src/test/setup.ts
+import '@testing-library/jest-dom';
+import { afterEach, vi } from 'vitest';
+
+afterEach(() => {
+  cleanup();
+  vi.clearAllMocks();
+  vi.useRealTimers();
+});
+
+// 4. package.json scripts
+// "test": "vitest run",
+// "test:watch": "vitest",
+// "test:coverage": "vitest run --coverage"</code></pre>
           </section>
         </section>
 
@@ -264,14 +287,30 @@ it('debe manejar errores de API', async () => {
 
           <section>
             <h2>Lab 2: Tests con Mocking</h2>
-            <div class="block-info">
-              <p><strong>Objetivo:</strong> Escribir tests que simulen llamadas a APIs</p>
-            </div>
-            <ol>
-              <li class="fragment">Crear el servicio TaskService</li>
-              <li class="fragment">Escribir tests unitarios con mocking</li>
-              <li class="fragment">Ejecutar los tests y verificar coverage</li>
-            </ol>
+            <pre><code class="language-typescript">import { describe, it, expect, vi } from 'vitest';
+
+// TaskService con mocks
+const mockFetch = vi.fn();
+vi.mock('./api', () => ({
+  fetchTasks: mockFetch
+}));
+
+describe('TaskService', () => {
+  beforeEach(() => mockFetch.mockReset());
+
+  it('debe obtener tareas', async () => {
+    const mockTasks = [{ id: '1', title: 'Test', status: 'pending' }];
+    mockFetch.mockResolvedValue(mockTasks);
+
+    const result = await fetchTasks();
+    expect(result).toEqual(mockTasks);
+  });
+
+  it('debe manejar errores', async () => {
+    mockFetch.mockRejectedValue(new Error('API Error'));
+    await expect(fetchTasks()).rejects.toThrow('API Error');
+  });
+});</code></pre>
           </section>
         </section>
 
@@ -342,14 +381,33 @@ const element = screen.getByTestId('unique-id');</code></pre>
 
           <section>
             <h2>Lab 3: Testear Componentes</h2>
-            <div class="block-info">
-              <p><strong>Objetivo:</strong> Testear componentes React del sistema de tareas</p>
-            </div>
-            <ol>
-              <li class="fragment">Testear TaskCard con diferentes estados</li>
-              <li class="fragment">Testear formulario de tareas</li>
-              <li class="fragment">Testear contexto de tareas</li>
-            </ol>
+            <pre><code class="language-typescript">import { render, screen, fireEvent } from '@testing-library/react';
+import { describe, it, expect, vi } from 'vitest';
+import { TaskCard } from './TaskCard';
+import { TaskForm } from './TaskForm';
+
+describe('TaskCard', () => {
+  it('debe renderizar tarea pendiente', () => {
+    render(&lt;TaskCard task={{ id: '1', title: 'Test', status: 'pending' }} /&gt;);
+    expect(screen.getByText('Test')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /completar/i })).toBeInTheDocument();
+  });
+
+  it('debe llamar onComplete al clic', () => {
+    const onComplete = vi.fn();
+    render(&lt;TaskCard task={{ id: '1', title: 'Test', status: 'pending' }} onComplete={onComplete} /&gt;);
+    fireEvent.click(screen.getByRole('button', { name: /completar/i }));
+    expect(onComplete).toHaveBeenCalledWith('1');
+  });
+});
+
+describe('TaskForm', () => {
+  it('debe validar título requerido', () => {
+    render(&lt;TaskForm onSubmit={vi.fn()} /&gt;);
+    fireEvent.click(screen.getByRole('button', { name: /guardar/i }));
+    expect(screen.getByText(/título requerido/i)).toBeInTheDocument();
+  });
+});</code></pre>
           </section>
         </section>
 
@@ -389,15 +447,35 @@ mockFetch.mockResolvedValue({ data: [taskMock] });</code></pre>
           </section>
 
           <section>
-            <h2>Lab 4: Mocks Fuertemenete Tipados</h2>
-            <div class="block-info">
-              <p><strong>Objetivo:</strong> Escribir tests con mocks completamente tipados</p>
-            </div>
-            <ol>
-              <li class="fragment">Definir interfaces para tipos de retorno</li>
-              <li class="fragment">Crear mocks con vi.fn&lt;()&gt;()</li>
-              <li class="fragment">Utilizar vi.mocked&lt;T&gt;() para objetos</li>
-            </ol>
+            <h2>Lab 4: Mocks Fuertemente Tipados</h2>
+            <pre><code class="language-typescript">import { vi } from 'vitest';
+
+// Interface para el mock tipado
+interface TaskServiceMock {
+  searchTasks: (query: string) => Promise<Task[]>;
+  addTask: (task: Omit<Task, 'id'>) => Promise<Task>;
+  deleteTask: (id: string) => Promise<void>;
+}
+
+// Factory de mock tipado
+const createMockTaskService = (): TaskServiceMock => ({
+  searchTasks: vi.fn<() => Promise<Task[]>>(),
+  addTask: vi.fn<() => Promise<Task>>(),
+  deleteTask: vi.fn<() => Promise<void>>()
+});
+
+// Uso con vi.mocked
+import { TaskService } from './services/taskService';
+const mockedService = vi.mocked(TaskService, true);
+
+it('debe buscar tareas con mock tipado', async () => {
+  const mockTasks: Task[] = [{ id: '1', title: 'Test' }];
+  const service = createMockTaskService();
+  service.searchTasks.mockResolvedValue(mockTasks);
+
+  const result = await service.searchTasks('test');
+  expect(result).toEqual(mockTasks);
+});</code></pre>
           </section>
         </section>
 
@@ -458,15 +536,36 @@ console.log(result.current.error);</code></pre>
 
           <section>
             <h2>Lab 5: Testear useTasks</h2>
-            <div class="block-info">
-              <p><strong>Objetivo:</strong> Escribir tests completos para custom hook</p>
-            </div>
-            <ol>
-              <li class="fragment">Crear el hook useTasks</li>
-              <li class="fragment">Testear estado inicial (loading = true)</li>
-              <li class="fragment">Testear carga exitosa</li>
-              <li class="fragment">Testear manejo de errores</li>
-            </ol>
+            <pre><code class="language-typescript">import { renderHook, act } from '@testing-library/react';
+import { useTasks } from './hooks/useTasks';
+
+describe('useTasks', () => {
+  it('debe tener estado inicial con loading=true', () => {
+    const { result } = renderHook(() => useTasks());
+    expect(result.current.tasks).toEqual([]);
+    expect(result.current.loading).toBe(true);
+    expect(result.current.error).toBeNull();
+  });
+
+  it('debe cargar tareas exitosamente', async () => {
+    const { result } = renderHook(() => useTasks());
+    await act(async () => {
+      await vi.waitFor(() => expect(result.current.loading).toBe(false));
+    });
+    expect(result.current.tasks.length).toBeGreaterThan(0);
+  });
+
+  it('debe manejar errores', async () => {
+    server.use(
+      rest.get('/api/tasks', (req, res, ctx) => res(ctx.status(500)))
+    );
+    const { result } = renderHook(() => useTasks());
+    await act(async () => {
+      await vi.waitFor(() => expect(result.current.error).not.toBeNull());
+    });
+    expect(result.current.error).toBe('Error al cargar');
+  });
+});</code></pre>
           </section>
         </section>
 
@@ -515,14 +614,28 @@ console.log(result.current.error);</code></pre>
 
           <section>
             <h2>Lab 6: Tests Parametrizados</h2>
-            <div class="block-info">
-              <p><strong>Objetivo:</strong> Escribir tests para validaciones de formulario</p>
-            </div>
-            <ol>
-              <li class="fragment">Crear función de validación</li>
-              <li class="fragment">Escribir tests parametrizados</li>
-              <li class="fragment">Casos: válido, sin título, título corto, sin prioridad</li>
-            </ol>
+            <pre><code class="language-typescript">// Función de validación
+function validateTaskForm(data: TaskFormData): string[] {
+  const errors: string[] = [];
+  if (!data.title) errors.push('Título requerido');
+  if (data.title.length < 3) errors.push('Título muy corto');
+  if (!data.priority) errors.push('Prioridad requerida');
+  return errors;
+}
+
+// Tests parametrizados con describe.each
+describe.each([
+  { title: 'Learn TypeScript', priority: 'high', valid: true },
+  { title: '', priority: 'high', valid: false, error: 'Título requerido' },
+  { title: 'Hi', priority: 'high', valid: false, error: 'Título muy corto' },
+  { title: 'Valid', priority: '', valid: false, error: 'Prioridad requerida' },
+])('validateTaskForm', ({ title, priority, valid, error }) => {
+  test(`debe ${valid ? 'pasar' : 'fallar con: ' + error}`, () => {
+    const errors = validateTaskForm({ title, priority });
+    if (!valid) expect(errors).toContain(error);
+    else expect(errors).toHaveLength(0);
+  });
+});</code></pre>
           </section>
         </section>
 
