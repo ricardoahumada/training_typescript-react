@@ -102,6 +102,23 @@ export { TaskService } from "./taskService";</code></pre>
                         <li class="fragment">Crea exports en <code>src/services/index.ts</code></li>
                     </ol>
                 </section>
+
+                <!-- Código Lab -->
+                <section>
+                    <h2>Código del Lab</h2>
+                    <pre><code class="language-typescript">// src/types/index.ts
+export type { Task, TaskStatus, TaskPriority } from "./task";
+export { TaskStatus, TaskPriority } from "./enums";
+export type { Filterable } from "./interfaces";
+
+// src/models/index.ts
+export { TaskModel } from "./task";
+export { UserModel } from "./user";
+
+// src/services/index.ts
+export { TaskService } from "./taskService";
+export { UserService } from "./userService";</code></pre>
+                </section>
             </section>
 
             <!-- ======================= SEGUNDA PÍLDORA → LAB ======================= -->
@@ -142,6 +159,24 @@ import React, { useState, useEffect } from "react";</code></pre>
                         <li class="fragment">Usa import * as para utilidades</li>
                     </ol>
                 </section>
+
+                <!-- Código Lab -->
+                <section>
+                    <h2>Código del Lab</h2>
+                    <pre><code class="language-typescript">// Alias para evitar conflictos
+import { Task as TaskEntity } from "@/types";
+import { Task as TaskDTO } from "@/api";
+
+// Múltiples exports
+import { TaskService, UserService } from "@/services";
+
+// Todo como objeto
+import * as Utils from "@/utils";
+console.log(Utils.formatDate, Utils.formatString);
+
+// Combinar default y named
+import TaskService, { Task, TaskStatus } from "@/services";</code></pre>
+                </section>
             </section>
 
             <!-- ======================= TERCERA PÍLDORA → LAB ======================= -->
@@ -174,6 +209,28 @@ import { TaskModel, UserModel, BookModel } from "@/models";</code></pre>
                         <li class="fragment">Crea barrel en <code>src/services/index.ts</code></li>
                         <li class="fragment">Verifica uso con un solo import</li>
                     </ol>
+                </section>
+
+                <!-- Código Lab -->
+                <section>
+                    <h2>Código del Lab</h2>
+                    <pre><code class="language-typescript">// src/types/index.ts (barrel)
+export * from "./task";
+export * from "./enums";
+export * from "./interfaces";
+
+// src/services/index.ts (barrel)
+export * from "./taskService";
+export * from "./userService";
+
+// Un solo import para todo el módulo
+import { 
+  Task, 
+  TaskStatus, 
+  TaskPriority,
+  TaskService,
+  UserService 
+} from "@/types";</code></pre>
                 </section>
             </section>
 

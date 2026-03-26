@@ -340,6 +340,55 @@ const strings: StringMap = {
                         <li class="fragment">Usa la interfaz en lugar de la implementación</li>
                     </ol>
                 </section>
+
+                <!-- Código Lab -->
+                <section>
+                    <h2>Código del Lab</h2>
+                    <pre><code class="language-typescript">interface ITaskService {
+  create(title: string, priority: TaskPriority): Task;
+  getAll(): Task[];
+  getById(id: string): Task | null;
+  update(task: Task): Task | null;
+  delete(id: string): boolean;
+  filterByStatus(status: TaskStatus): Task[];
+  filterByPriority(priority: TaskPriority): Task[];
+}
+
+class TaskService implements ITaskService {
+  constructor(private repository: ITaskRepository) {}
+  
+  create(title: string, priority: TaskPriority): Task {
+    const task = createTask(title, priority);
+    return this.repository.save(task);
+  }
+  
+  getAll(): Task[] {
+    return this.repository.findAll();
+  }
+  
+  getById(id: string): Task | null {
+    return this.repository.findById(id);
+  }
+  
+  update(task: Task): Task | null {
+    const existing = this.repository.findById(task.id);
+    if (!existing) return null;
+    return this.repository.save(task);
+  }
+  
+  delete(id: string): boolean {
+    return this.repository.delete(id);
+  }
+  
+  filterByStatus(status: TaskStatus): Task[] {
+    return this.getAll().filter(t => t.status === status);
+  }
+  
+  filterByPriority(priority: TaskPriority): Task[] {
+    return this.getAll().filter(t => t.priority === priority);
+  }
+}</code></pre>
+                </section>
             </section>
 
             <!-- ======================= TERCERA PÍLDORA → LAB ======================= -->
@@ -398,15 +447,85 @@ d.greet(); // "Hola, mundo!"
 
                 <!-- Lab -->
                 <section>
-                    <h2>Lab: Herencia en el Sistema de Tareas</h2>
+                    <h2>Lab: Tipos Especiales de Tareas</h2>
                     <div class="block-info">
-                        <p><strong>Objetivo:</strong> Crear clases especializadas que hereden de Task.</p>
+                        <p><strong>Objetivo:</strong> Implementar herencia para tipos especializados de tareas.</p>
                     </div>
                     <ol>
-                        <li class="fragment">Crea clase <code>Task</code> como clase base</li>
-                        <li class="fragment">Crea clase <code>UrgentTask</code> que hereda de Task</li>
-                        <li class="fragment">Crea clase <code>RecurringTask</code> con propiedades adicionales</li>
+                        <li class="fragment">Crea clase base abstracta <code>BaseTask</code></li>
+                        <li class="fragment">Crea clase <code>RegularTask</code> que hereda de BaseTask</li>
+                        <li class="fragment">Crea clase <code>UrgentTask</code> que hereda de BaseTask</li>
+                        <li class="fragment">Crea clase <code>RecurringTask</code> que hereda de BaseTask</li>
                     </ol>
+                </section>
+
+                <!-- Código Lab -->
+                <section>
+                    <h2>Código del Lab</h2>
+                    <pre><code class="language-typescript">abstract class BaseTask {
+  constructor(
+    public id: string,
+    public title: string,
+    public status: TaskStatus = "pending"
+  ) {}
+  
+  abstract getPriority(): number;
+  
+  complete(): void {
+    this.status = "completed";
+  }
+}
+
+class RegularTask extends BaseTask {
+  constructor(
+    id: string,
+    title: string,
+    public priority: TaskPriority
+  ) {
+    super(id, title);
+  }
+  
+  getPriority(): number {
+    const levels: Record<TaskPriority, number> = {
+      low: 1, medium: 2, high: 3
+    };
+    return levels[this.priority];
+  }
+}
+
+class UrgentTask extends BaseTask {
+  constructor(
+    id: string,
+    title: string,
+    public reason: string
+  ) {
+    super(id, title);
+  }
+  
+  getPriority(): number {
+    return 4; // Siempre alta prioridad
+  }
+}
+
+class RecurringTask extends BaseTask {
+  constructor(
+    id: string,
+    title: string,
+    public frequency: "daily" | "weekly" | "monthly",
+    public completedCount: number = 0
+  ) {
+    super(id, title);
+  }
+  
+  complete(): void {
+    super.complete();
+    this.completedCount++;
+  }
+  
+  getPriority(): number {
+    return this.completedCount === 0 ? 3 : 1;
+  }
+}</code></pre>
                 </section>
             </section>
 

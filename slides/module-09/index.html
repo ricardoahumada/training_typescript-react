@@ -235,6 +235,52 @@ const userRepo = new Repository&lt;User&gt;();</code></pre>
               <li class="fragment">Añade métodos de búsqueda</li>
             </ol>
           </section>
+
+          <!-- Código Lab -->
+          <section>
+            <h2>Código del Lab</h2>
+            <pre><code class="language-typescript">// TaskRepository (versión específica)
+class TaskRepository {
+  private tasks: Task[] = [];
+  
+  add(task: Task): void { this.tasks.push(task); }
+  getAll(): Task[] { return [...this.tasks]; }
+  findById(id: string): Task | undefined {
+    return this.tasks.find(t => t.id === id);
+  }
+  update(task: Task): boolean {
+    const index = this.tasks.findIndex(t => t.id === task.id);
+    if (index > -1) { this.tasks[index] = task; return true; }
+    return false;
+  }
+  delete(id: string): boolean {
+    const index = this.tasks.findIndex(t => t.id === id);
+    if (index > -1) { this.tasks.splice(index, 1); return true; }
+    return false;
+  }
+}
+
+// Repository<T> (versión genérica)
+class Repository<T> {
+  private items: T[] = [];
+  
+  add(item: T): void { this.items.push(item); }
+  getAll(): T[] { return [...this.items]; }
+  findById(id: string): T | undefined {
+    return this.items.find((item: any) => item.id === id);
+  }
+  update(item: T): boolean {
+    const index = this.items.findIndex((i: any) => i.id === (item as any).id);
+    if (index > -1) { this.items[index] = item; return true; }
+    return false;
+  }
+  delete(id: string): boolean {
+    const index = this.items.findIndex((item: any) => item.id === id);
+    if (index > -1) { this.items.splice(index, 1); return true; }
+    return false;
+  }
+}</code></pre>
+          </section>
         </section>
 
         <!-- ======================= CUARTA PÍLDORA → LAB ======================= -->

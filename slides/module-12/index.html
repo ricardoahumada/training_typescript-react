@@ -107,6 +107,27 @@ export default {
                         <li class="fragment">Verifica configuración</li>
                     </ol>
                 </section>
+
+                <!-- Código Lab -->
+                <section>
+                    <h2>Código del Lab</h2>
+                    <pre><code class="language-bash">npm install -D jest ts-jest @types/jest</code></pre>
+                    <pre><code class="language-javascript">// jest.config.js
+module.exports = {
+  preset: "ts-jest",
+  testEnvironment: "node",
+  roots: ["<rootDir>/src", "<rootDir>/tests"],
+  testMatch: ["**/__tests__/**/*.ts", "**/?(*.)+(spec|test).ts"],
+  moduleFileExtensions: ["ts", "js", "json"],
+  collectCoverageFrom: ["src/**/*.ts", "!src/**/*.d.ts"]
+};</code></pre>
+                    <pre><code class="language-json">{
+  "scripts": {
+    "test": "jest",
+    "test:coverage": "jest --coverage"
+  }
+}</code></pre>
+                </section>
             </section>
 
             <!-- ======================= SEGUNDA PÍLDORA → LAB ======================= -->
@@ -219,6 +240,44 @@ jest.spyOn(global, "Date").mockImplementation(() => mockDate);</code></pre>
                         <li class="fragment">Verifica llamadas con tipos</li>
                     </ol>
                 </section>
+
+                <!-- Código Lab -->
+                <section>
+                    <h2>Código del Lab</h2>
+                    <pre><code class="language-typescript">import { TaskRepository } from "../src/repositories/taskRepository";
+import { TaskService } from "../src/services/taskService";
+
+describe("TaskService with mocks", () => {
+  let mockRepository: jest.Mocked<TaskRepository>;
+  let service: TaskService;
+  
+  beforeEach(() => {
+    mockRepository = {
+      findAll: jest.fn(),
+      findById: jest.fn(),
+      save: jest.fn(),
+      delete: jest.fn()
+    };
+    service = new TaskService(mockRepository);
+  });
+  
+  test("getAll calls repository", () => {
+    mockRepository.findAll.mockReturnValue([]);
+    const result = service.getAll();
+    expect(mockRepository.findAll).toHaveBeenCalled();
+    expect(result).toEqual([]);
+  });
+  
+  test("getAll returns tasks from repository", () => {
+    const mockTasks: Task[] = [
+      { id: "1", title: "Task 1", status: "pending", priority: "high" }
+    ];
+    mockRepository.findAll.mockReturnValue(mockTasks);
+    const result = service.getAll();
+    expect(result).toEqual(mockTasks);
+  });
+});</code></pre>
+                </section>
             </section>
 
             <!-- ======================= 4bis. SPYON Y THROW ======================= -->
@@ -264,6 +323,85 @@ test("throws error for negative age", () => {
                         <li class="fragment">Usa <code>vi.spyOn</code> para espiar llamadas</li>
                         <li class="fragment">Usa <code>toThrow</code> para verificar errores</li>
                     </ol>
+                </section>
+
+                <!-- Código Lab -->
+                <section>
+                    <h2>Código del Lab</h2>
+                    <pre><code class="language-typescript">// Test con spyOn
+test("calls logger on error", () => {
+  const loggerSpy = vi.spyOn(logger, "error");
+  
+  service.processTask(task);
+  
+  expect(loggerSpy).toHaveBeenCalled();
+  loggerSpy.mockRestore();
+});
+
+// Test con toThrow
+test("throws when task not found", () => {
+  expect(() => service.deleteTask("non-existent"))
+    .toThrow("Task not found");
+});
+
+// Spy con mockImplementation
+test("mocks Date.now()", () => {
+  const mockDate = new Date("2024-01-01");
+  vi.spyOn(global, "Date").mockImplementation(() => mockDate);
+  
+  const result = service.getTimestamp();
+  expect(result).toBe(mockDate.getTime());
+});</code></pre>
+                </section>
+            </section>
+
+            <!-- ======================= 5. COVERAGE ======================= -->
+            <section>
+                <section class="section-divider">
+                    <h1>5. Coverage</h1>
+                </section>
+
+                <!-- Píldora -->
+                <section>
+                    <h2>Coverage</h2>
+                    <p class="fragment">Coverage mide qué porcentaje del código está probado.</p>
+                    <pre><code class="language-bash">npm run test:coverage</code></pre>
+                    <p>Genera reporte en <code>coverage/</code>.</p>
+                </section>
+
+                <!-- Lab -->
+                <section>
+                    <h2>Lab: Mejorar Coverage</h2>
+                    <div class="block-info">
+                        <p><strong>Objetivo:</strong> Lograr >80% coverage.</p>
+                    </div>
+                    <ol>
+                        <li class="fragment">Ejecuta coverage</li>
+                        <li class="fragment">Identifica áreas sin coverage</li>
+                        <li class="fragment">Añade tests para casos borde</li>
+                    </ol>
+                </section>
+
+                <!-- Código Lab -->
+                <section>
+                    <h2>Código del Lab</h2>
+                    <pre><code class="language-bash">npm run test:coverage</code></pre>
+                    <pre><code class="language-plaintext">|-----------|----------|----------|----------|---------|
+| File      | % Stmts  | % Branch | % Funcs  | % Lines |
+|-----------|----------|----------|----------|---------|
+| taskServ..| 75.00%   | 50.00%   | 66.67%   | 70.00%  |
+|-----------|----------|----------|----------|---------|</code></pre>
+                    <pre><code class="language-typescript">describe("edge cases", () => {
+  it("should handle empty title", () => {
+    const task = service.createTask("", "low");
+    expect(task.title).toBe("");
+  });
+  
+  it("should return null for non-existent task", () => {
+    const result = service.getTaskById("non-existent");
+    expect(result).toBeNull();
+  });
+});</code></pre>
                 </section>
             </section>
 

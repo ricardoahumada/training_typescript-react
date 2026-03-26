@@ -153,6 +153,70 @@ export class TaskService {
               </li>
             </ol>
           </section>
+
+          <!-- Código Lab -->
+          <section>
+            <h2>Código del Lab</h2>
+            <pre><code class="language-typescript">// Estructura de carpetas
+// src/
+// ├── types/index.ts
+// ├── models/task.ts
+// ├── services/taskService.ts
+// └── index.ts
+
+// src/types/index.ts
+export type TaskStatus = "pending" | "inProgress" | "completed";
+export type TaskPriority = "low" | "medium" | "high";
+
+export interface Task {
+  id: string;
+  title: string;
+  description?: string;
+  status: TaskStatus;
+  priority: TaskPriority;
+  assigneeId?: string;
+  dueDate?: Date;
+}
+
+// src/models/task.ts
+import { TaskStatus, TaskPriority } from "../types";
+
+export class TaskModel {
+  constructor(
+    public readonly id: string,
+    public title: string,
+    public status: TaskStatus,
+    public priority: TaskPriority
+  ) {}
+  
+  complete(): void {
+    this.status = "completed";
+  }
+}
+
+// src/services/taskService.ts
+import { Task } from "../types";
+import { TaskModel } from "../models/task";
+
+export class TaskService {
+  private tasks: TaskModel[] = [];
+  
+  create(title: string, priority: Task["priority"]): TaskModel {
+    const task = new TaskModel(
+      crypto.randomUUID(),
+      title,
+      "pending",
+      priority
+    );
+    this.tasks.push(task);
+    return task;
+  }
+  
+  getAll(): TaskModel[] {
+    return [...this.tasks];
+  }
+}</code></pre>
+          </section>
         </section>
 
         <!-- ======================= 2bis. EXPORT E IMPORT AVANZADO ======================= -->
@@ -239,6 +303,28 @@ import { TaskService } from "@services/taskService";</code></pre>
               <li class="fragment">Define los paths</li>
               <li class="fragment">Verifica imports con alias</li>
             </ol>
+          </section>
+
+          <!-- Código Lab -->
+          <section>
+            <h2>Código del Lab</h2>
+            <pre><code class="language-json">{
+  "compilerOptions": {
+    "baseUrl": "./src",
+    "paths": {
+      "@/*": ["./*"]
+    }
+  }
+}</code></pre>
+            <pre><code class="language-typescript">// Con path mapping
+import { Task } from "@/types";
+import { TaskModel } from "@/models/task";
+import { TaskService } from "@/services/taskService";
+
+// Sin path mapping (relativo)
+import { Task } from "../types";
+import { TaskModel } from "../models/task";
+import { TaskService } from "../services/taskService";</code></pre>
           </section>
         </section>
 

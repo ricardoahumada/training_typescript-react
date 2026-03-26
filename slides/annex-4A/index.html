@@ -120,6 +120,26 @@ type TaskMap = Record&lt;string, Task&gt;;  // Objeto con claves string</code></
               <tr><td>Record&lt;K,V&gt;</td><td>Índice/Map</td></tr>
             </table>
           </section>
+
+          <!-- Utilidad -->
+          <section>
+            <h2>Por qué usar Utility Types - DRY</h2>
+            <p class="fragment"><strong>Problema:</strong> Definir tipos similares manualmente causa duplicación</p>
+            <pre><code class="language-typescript">// SIN utility types - duplicación!
+interface TaskEdit { title?: string; ... }
+interface TaskCreate { title: string; ... }
+
+// CON utility types - DRY!
+type TaskEdit = Partial&lt;Task&gt;;
+type TaskCreate = Omit&lt;Task, 'id'&gt;;</code></pre>
+            <table>
+              <tr><th>Beneficio</th><th>Descripción</th></tr>
+              <tr><td>Una fuente de verdad</td><td>Cambias Task, todo se actualiza</td></tr>
+              <tr><td>Menos bugs</td><td>No redefines tipos incorrectamente</td></tr>
+              <tr><td>Mantenimiento</td><td>Un cambio actualiza 5 tipos derivados</td></tr>
+            </table>
+          </section>
+
           <section>
             <h2>Lab: Utility Types</h2>
             <ol>
@@ -127,6 +147,22 @@ type TaskMap = Record&lt;string, Task&gt;;  // Objeto con claves string</code></
               <li class="fragment">Crear tipo para respuesta sin id (Omit)</li>
               <li class="fragment">Crear índice de tareas por prioridad (Record)</li>
             </ol>
+          </section>
+
+          <!-- Código Lab -->
+          <section>
+            <h2>Código del Lab</h2>
+            <pre><code class="language-typescript">// 1. Formulario de edición - todos los campos opcionales
+type EditTaskParams = Partial<Task>;
+
+// 2. Datos para crear tarea (servidor genera id)
+type CreateTaskParams = Omit<Task, 'id'>;
+
+// 3. Índice de tareas por prioridad
+type TasksByPriority = Record<string, Task[]>;
+
+// 4. Búsqueda con resultados preview
+type TaskSearchResult = Pick<Task, 'id' | 'title' | 'status'>;</code></pre>
           </section>
         </section>
 
@@ -147,12 +183,58 @@ getProp(task, 'title');    // ✅ string
 getProp(task, 'priority'); // ✅ string
 getProp(task, 'status');   // ❌ Error: no existe</code></pre>
           </section>
+
+          <!-- Utilidad -->
+          <section>
+            <h2>extends vs any - Compile Time Errors</h2>
+            <p class="fragment"><code>any</code> permite cualquier cosa - sin seguridad</p>
+            <pre><code class="language-typescript">// SIN constraint - any
+function getValue(obj: any, key: any) {
+  return obj[key]; // ✅ compila, ❌ puede fallar en runtime!
+}
+
+// CON extends - type safety
+function getValue&lt;T, K extends keyof T&gt;(obj: T, key: K): T[K] {
+  return obj[key]; // ✅ compila SI y solo SI key existe
+}</code></pre>
+            <table>
+              <tr><th>Situación</th><th>Solución</th></tr>
+              <tr><td>Debe tener ciertas props</td><td>extends { prop: type }</td></tr>
+              <tr><td>Debe ser objeto</td><td>extends object</td></tr>
+              <tr><td>Solo keys válidas</td><td>extends keyof T</td></tr>
+            </table>
+          </section>
+
           <section>
             <h2>Lab: Generic Constraints</h2>
             <ol>
               <li class="fragment">Crear componente genérico con constraint</li>
               <li class="fragment">Usar extends para asegurar que tiene id</li>
             </ol>
+          </section>
+
+          <!-- Código Lab -->
+          <section>
+            <h2>Código del Lab</h2>
+            <pre><code class="language-typescript">interface WithId {
+  id: string;
+}
+
+interface ListProps&lt;T extends WithId&gt; {
+  items: T[];
+  renderItem: (item: T) =&gt; React.ReactNode;
+  keyExtractor: (item: T) =&gt; string;
+}
+
+function List&lt;T extends WithId&gt;({ items, renderItem, keyExtractor }: ListProps&lt;T&gt;) {
+  return (
+    &lt;ul&gt;
+      {items.map(item =&gt; (
+        &lt;li key={keyExtractor(item)}&gt;{renderItem(item)}&lt;/li&gt;
+      ))}
+    &lt;/ul&gt;
+  );
+}</code></pre>
           </section>
         </section>
 
@@ -171,12 +253,56 @@ const invalid: APIRoute = '/other';       // ❌
 type TaskEvent = 'onClick' | 'onSubmit';
 type Handler = { [K in TaskEvent]?: () => void };</code></pre>
           </section>
+
+          <!-- Utilidad -->
+          <section>
+            <h2>La Magia: Errores en Compile Time</h2>
+            <p class="fragment">Template literals detectan errores antes de runtime</p>
+            <pre><code class="language-typescript">// SIN template literals - error en runtime
+type Handler = { [key: string]: () => void };
+const h: Handler = { onClik: () => {} }; // ✅ Compila! ❌ Runtime
+
+// CON template literals - error en compile time
+type TaskEvent = 'onClick' | 'onSubmit';
+type Handler = { [K in TaskEvent]?: () => void };
+const h: Handler = { onClik: () => {} }; // ❌ Error!
+</code></pre>
+            <table>
+              <tr><th>Caso</th><th>Beneficio</th></tr>
+              <tr><td>Rutas API</td><td>Detecta rutas inválidas</td></tr>
+              <tr><td>Event handlers</td><td>Autocomplete + validation</td></tr>
+              <tr><td>CSS classes</td><td>Tailwind typesafe</td></tr>
+            </table>
+          </section>
+
           <section>
             <h2>Lab: Template Literal Types</h2>
             <ol>
               <li class="fragment">Tipar acciones de tareas</li>
               <li class="fragment">Crear tipos para eventos</li>
             </ol>
+          </section>
+
+          <!-- Código Lab -->
+          <section>
+            <h2>Código del Lab</h2>
+            <pre><code class="language-typescript">// Tipos para acciones de tareas
+type TaskAction = 'create' | 'update' | 'delete' | 'complete';
+type TaskRoute = `/tasks/${TaskAction}`;
+
+// '/tasks/create' ✅
+// '/tasks/delete' ✅
+// '/tasks/invalid' ❌
+
+// Tipos para eventos de tarea
+type TaskEvent = 'onClick' | 'onSubmit' | 'onChange';
+type TaskEventHandler = { [K in TaskEvent]?: () => void };
+
+// Tipos para estados
+type TaskStatus = 'pending' | 'inProgress' | 'completed';
+type StatusHandler = {
+  [K in TaskStatus]: () => string;
+};</code></pre>
           </section>
         </section>
 
@@ -192,12 +318,53 @@ type Handler = { [K in TaskEvent]?: () => void };</code></pre>
 type Optional&lt;T&gt; = { [K in keyof T]?: T[K] };
 type Nullable&lt;T&gt; = { [K in keyof T]: T[K] | null };</code></pre>
           </section>
+
+          <!-- Utilidad -->
+          <section>
+            <h2>DRY: Transformaciones Automáticas</h2>
+            <p class="fragment">Mapped Types permiten transformar tipos sin duplicar código</p>
+            <pre><code class="language-typescript">// SIN Mapped Types - manual y propenso a errores
+interface User { name: string; email: string; }
+type ReadonlyUser = { readonly name: string; readonly email: string; }; // duplicado!
+
+// CON Mapped Types - una fuente de verdad
+type Readonly&lt;T&gt; = { readonly [K in keyof T]: T[K] };
+type ReadonlyUser = Readonly&lt;User&gt;; // se actualiza si User cambia</code></pre>
+            <table>
+              <tr><th>Transformación</th><th>Uso</th></tr>
+              <tr><td>Readonly&lt;T&gt;</td><td>Props que no deben mutar</td></tr>
+              <tr><td>Optional&lt;T&gt;</td><td>Formularios de edición</td></tr>
+              <tr><td>Nullable&lt;T&gt;</td><td>API responses</td></tr>
+            </table>
+          </section>
+
           <section>
             <h2>Lab: Mapped Types</h2>
             <ol>
               <li class="fragment">Hacer todos los campos opcionales</li>
               <li class="fragment">Agregar prefijos</li>
             </ol>
+          </section>
+
+          <!-- Código Lab -->
+          <section>
+            <h2>Código del Lab</h2>
+            <pre><code class="language-typescript">// Mapped type para hacer todos los campos opcionales
+type Partial<T> = { [K in keyof T]?: T[K] };
+
+// Mapped type para hacer todos los campos readonly
+type Readonly<T> = { readonly [K in keyof T]: T[K] };
+
+// Mapped type para hacer todos los campos nullable
+type Nullable<T> = { [K in keyof T]: T[K] | null };
+
+// Mapped type con prefijo
+type WithPrefix<T, P extends string> = {
+  [K in keyof T as `${P}${K & string}`]: T[K]
+};
+
+type TaskPrefix = WithPrefix<Task, 'task_'>;
+// { task_id: string; task_title: string; ... }</code></pre>
           </section>
         </section>
 
@@ -219,6 +386,24 @@ function getTask() {
 const colors = ['red', 'blue'] as const;
 // readonly ['red', 'blue']</code></pre>
           </section>
+
+          <!-- Utilidad -->
+          <section>
+            <h2>Inferencia: Cuándo Confiar y Cuándo Ser Explícito</h2>
+            <table>
+              <tr><th>Situación</th><th>Inferencia</th><th>Por qué</th></tr>
+              <tr><td>Variables locales</td><td>✅ Sí</td><td>TS infiere bien</td></tr>
+              <tr><td>Return de funciones</td><td>✅ Sí</td><td>TS infiere el tipo exacto</td></tr>
+              <tr><td>Arrays de objetos</td><td>✅ Sí</td><td>Infiere cada propiedad</td></tr>
+              <tr><td>Constantes literales</td><td>❌ No</td><td>Quiere string, usa as const</td></tr>
+            </table>
+            <pre><code class="language-typescript">// EXPLÍCITO cuando necesitas control
+function createTask(title: string): Task { ... }
+
+// as const - preserva literales
+const STATUSES = ['pending', 'done'] as const;
+type Status = typeof STATUSES[number]; // 'pending' | 'done'</code></pre>
+          </section>
         </section>
 
         <!-- SECCION 7: Satisfies -->
@@ -235,6 +420,49 @@ const c1 = 'debug' as string; // c1: string
 // satisfies - mantiene literal + valida
 const c2 = 'debug' satisfies 'debug' | 'info' | 'error';
 // c2: 'debug' (literal)</code></pre>
+          </section>
+
+          <!-- Utilidad -->
+          <section>
+            <h2>Decision Matrix: satisfies vs as</h2>
+            <table>
+              <tr><th>Necesitas...</th><th>Solución</th></tr>
+              <tr><td>Validar tipo PERO mantener literal</td><td>satisfies</td></tr>
+              <tr><td>Forzar tipo sin importar el valor</td><td>as</td></tr>
+              <tr><td>Autocomplete de literales</td><td>satisfies</td></tr>
+              <tr><td>Casting a tipo incompatible</td><td>as</td></tr>
+            </table>
+            <pre><code class="language-typescript">// Caso práctico: validación con inferencia
+type Color = 'primary' | 'secondary' | 'success';
+const colores = {
+  activo: 'primary',
+  hover: 'secondary'
+} satisfies Record&lt;string, Color&gt;;
+
+// colores.activo es "primary" (literal), no string
+usarColor(colores.activo); // ✅ Funciona</code></pre>
+          </section>
+
+          <!-- Lab -->
+          <section>
+            <h2>Lab: Operador Satisfies para el Caso 1r</h2>
+            <pre><code class="language-typescript">// Caso: Configuración de tareas tipada
+type Priority = 'low' | 'medium' | 'high';
+
+const taskConfig = {
+  maxTitleLength: 100,
+  defaultPriority: 'medium' as const,
+  allowedStatuses: ['pending', 'inProgress', 'completed'] as const
+} satisfies {
+  maxTitleLength: number;
+  defaultPriority: Priority;
+  readonly allowedStatuses: readonly (keyof Task)[];
+};
+
+// ✅ type narrowing: 'medium' literal, no string
+type Priority2 = 'low' | 'medium' | 'high';
+function setPriority(p: Priority2) {}
+setPriority(taskConfig.defaultPriority); // ✅</code></pre>
           </section>
         </section>
 
@@ -280,6 +508,53 @@ function BookCard({ titulo, autor, año }: BookCardProps) {
   );
 }</code></pre>
           </section>
+
+          <!-- Utilidad -->
+          <section>
+            <h2>ROI: Por qué Migrar a TSX</h2>
+            <table>
+              <tr><th>Aspecto</th><th>JSX</th><th>TSX</th></tr>
+              <tr><td>Errores de props</td><td>Runtime</td><td>Compile time ✅</td></tr>
+              <tr><td>Autocomplete</td><td>Ninguno</td><td>Total ✅</td></tr>
+              <tr><td>Refactoring</td><td>Peligroso</td><td>Seguro ✅</td></tr>
+              <tr><td>Documentación</td><td>Comentarios</td><td>Tipos ✅</td></tr>
+            </table>
+            <pre><code class="language-typescript">// JSX - error en runtime!
+&lt;BookCard titulo="Libro" /&gt; // ✅ Compila, ❌ falla (titulo vs title)
+
+// TSX - error en compile time!
+&lt;BookCard titulo="Libro" /&gt; // ❌ Error: 'titulo' does not exist</code></pre>
+          </section>
+
+          <!-- Lab -->
+          <section>
+            <h2>Lab: Migrar Componente JSX a TSX</h2>
+            <pre><code class="language-typescript">interface Task {
+  id: string;
+  title: string;
+  description: string;
+  status: 'pending' | 'inProgress' | 'completed';
+  priority: 'low' | 'medium' | 'high';
+}
+
+interface TaskCardProps {
+  task: Task;
+  onComplete?: (id: string) =&gt; void;
+}
+
+function TaskCard({ task, onComplete }: TaskCardProps) {
+  return (
+    &lt;div className="task-card"&gt;
+      &lt;h3&gt;{task.title}&lt;/h3&gt;
+      &lt;p&gt;{task.description}&lt;/p&gt;
+      &lt;span&gt;{task.status === 'completed' ? 'Completada' : 'Pendiente'}&lt;/span&gt;
+      {onComplete && (
+        &lt;button onClick={() =&gt; onComplete(task.id)}&gt;Completar&lt;/button&gt;
+      )}
+    &lt;/div&gt;
+  );
+}</code></pre>
+          </section>
         </section>
 
         <!-- SECCION 9: Tipado de Props y Children -->
@@ -307,6 +582,50 @@ interface CardProps {
               <tr><td>string</td><td>Solo texto</td></tr>
             </table>
           </section>
+
+          <!-- Utilidad -->
+          <section>
+            <h2>Props: Cuándo Opcionales vs Requeridas</h2>
+            <pre><code class="language-typescript">// Props requeridas - el componente NO funciona sin ellas
+interface ButtonProps {
+  label: string;           // Requerido
+  onClick: () => void;   // Requerido
+}
+
+// Props opcionales - tienen valor por defecto
+interface ButtonProps {
+  variant?: 'primary' | 'secondary';  // default 'primary'
+  disabled?: boolean;                   // default false
+}</code></pre>
+          </section>
+
+          <!-- Lab -->
+          <section>
+            <h2>Lab: Tipar Componentes con Children</h2>
+            <pre><code class="language-typescript">function Layout({ children, header }: { children: React.ReactNode; header: React.ReactNode }) {
+  return (
+    &lt;div&gt;
+      &lt;header&gt;{header}&lt;/header&gt;
+      &lt;main&gt;{children}&lt;/main&gt;
+    &lt;/div&gt;
+  );
+}
+
+interface ButtonProps {
+  label: string;
+  onClick?: () =&gt; void;
+  variant?: 'primary' | 'secondary';
+  disabled?: boolean;
+}
+
+function Button({ label, onClick, variant = 'primary', disabled }: ButtonProps) {
+  return (
+    &lt;button className={`btn btn-${variant}`} onClick={onClick} disabled={disabled}&gt;
+      {label}
+    &lt;/button&gt;
+  );
+}</code></pre>
+          </section>
         </section>
 
         <!-- SECCION 10: Tipado de State -->
@@ -323,6 +642,37 @@ const [task, setTask] = useState({ title: 'Learn' });
 // Explícito
 const [tasks, setTasks] = useState&lt;Task[]&gt;([]);
 const [task, setTask] = useState&lt;Task | null&gt;(null);</code></pre>
+          </section>
+
+          <!-- Utilidad -->
+          <section>
+            <h2>useState: Inferencia vs Explícito</h2>
+            <pre><code class="language-typescript">// ❌ EXPLÍCITO redundante
+const [name, setName] = useState&lt;string&gt;(''); // string ya se infiere
+
+// ❌ EXPLÍCITO necesario - valor inicial ambiguous
+const [user, setUser] = useState&lt;User | null&gt;(null);
+
+// ✅ INFIRME - tipo obvio
+const [count, setCount] = useState(0);
+const [items, setItems] = useState&lt;string[]&gt;([]);
+const [loading, setLoading] = useState(false);</code></pre>
+          </section>
+
+          <!-- Lab -->
+          <section>
+            <h2>Lab: Estado Tipado para Tareas</h2>
+            <pre><code class="language-typescript">const [tasks, setTasks] = useState&lt;Task[]&gt;([]);
+const [loading, setLoading] = useState&lt;boolean&gt;(false);
+const [error, setError] = useState&lt;string | null&gt;(null);
+
+function addTask(newTask: Task) {
+  setTasks(prev =&gt; [...prev, newTask]);
+}
+
+function removeTask(id: string) {
+  setTasks(prev =&gt; prev.filter(t =&gt; t.id !== id));
+}</code></pre>
           </section>
         </section>
 
@@ -341,6 +691,52 @@ onChange={(e) => setValue(e.target.value)}
 // Form submit
 onSubmit={(e) => e.preventDefault()}
 // e: FormEvent&lt;HTMLFormElement&gt;</code></pre>
+          </section>
+
+          <!-- Utilidad -->
+          <section>
+            <h2>Eventos: Errores en Compile Time</h2>
+            <pre><code class="language-typescript">// ❌ ERROR: type 'string' is not assignable
+&lt;input onChange={(e) =&gt; setValue(123)} /&gt;
+
+// ✅ CORRECTO: type-safe
+&lt;input value={value} onChange={(e) =&gt; setValue(e.target.value)} /&gt;
+
+// ❌ ERROR: Property 'target' does not exist
+&lt;button onClick={() =&gt; console.log(e.target)}&gt;
+
+// ✅ CORRECTO: tienes el tipo completo del evento
+&lt;button onClick={(e) =&gt; console.log(e.currentTarget)}&gt;</code></pre>
+          </section>
+
+          <!-- Lab -->
+          <section>
+            <h2>Lab: Formulario de Tareas Tipado</h2>
+            <pre><code class="language-typescript">interface TaskFormData {
+  title: string;
+  description: string;
+  priority: 'low' | 'medium' | 'high';
+}
+
+function TaskForm({ onSubmit }: { onSubmit: (data: TaskFormData) =&gt; void }) {
+  const [title, setTitle] = useState('');
+
+  const handleSubmit = (e: React.FormEvent) =&gt; {
+    e.preventDefault();
+    onSubmit({ title, description: '', priority: 'medium' });
+  };
+
+  return (
+    &lt;form onSubmit={handleSubmit}&gt;
+      &lt;input 
+        value={title} 
+        onChange={(e) =&gt; setTitle(e.target.value)}
+        placeholder="Task title"
+      /&gt;
+      &lt;button type="submit"&gt;Crear Tarea&lt;/button&gt;
+    &lt;/form&gt;
+  );
+}</code></pre>
           </section>
         </section>
 
@@ -361,6 +757,43 @@ const handleClick = useCallback(() => { ... }, []);
 // useMemo
 const filtered = useMemo(() => tasks.filter(...), [tasks]);</code></pre>
           </section>
+
+          <!-- Utilidad -->
+          <section>
+            <h2>Hooks: Optimización Real vs Teórica</h2>
+            <table>
+              <tr><th>Hook</th><th>¿Cuándo realmente ayuda?</th><th>¿Cuándo es overkill?</th></tr>
+              <tr><td>useMemo</td><td> Cálculos pesados en cada render</td><td> Valores simples o funciones inline</td></tr>
+              <tr><td>useCallback</td><td> Pass callbacks a child memorizados</td><td>Handlers simples sin children</td></tr>
+              <tr><td>useRef</td><td> Access DOM, valores mutables</td><td> State que necesita re-render</td></tr>
+            </table>
+          </section>
+
+          <!-- Lab -->
+          <section>
+            <h2>Lab: Optimizar Componente con Hooks</h2>
+            <pre><code class="language-typescript">function TaskList({ tasks, filter }: { tasks: Task[]; filter: string }) {
+  const inputRef = useRef&lt;HTMLInputElement&gt;(null);
+
+  const filteredTasks = useMemo(() =&gt; {
+    if (!filter) return tasks;
+    return tasks.filter(task =&gt; 
+      task.title.toLowerCase().includes(filter.toLowerCase())
+    );
+  }, [tasks, filter]);
+
+  const focusInput = useCallback(() =&gt; {
+    inputRef.current?.focus();
+  }, []);
+
+  return (
+    &lt;div&gt;
+      &lt;input ref={inputRef} type="text" placeholder="Buscar..." /&gt;
+      &lt;button onClick={focusInput}&gt;Focus&lt;/button&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+          </section>
         </section>
 
         <!-- SECCION 13: Componentes Genéricos -->
@@ -380,6 +813,45 @@ function List&lt;T&gt;({ items, renderItem }: ListProps&lt;T&gt;) {
   return &lt;ul&gt;{items.map(renderItem)}&lt;/ul&gt;;
 }</code></pre>
           </section>
+
+          <!-- Utilidad -->
+          <section>
+            <h2>Componentes Genéricos: Reutilización Real</h2>
+            <pre><code class="language-typescript">// ❌ Sin genéricos: repetir código
+&lt;StringList items={names} /&gt;
+&lt;NumberList items={ages} /&gt;
+&lt;UserList items={users} /&gt;
+
+// ✅ Con genéricos: UN componente para todos
+&lt;List&lt;string&gt; items={names} renderItem={(n) =&gt; &lt;li&gt;{n}&lt;/li&gt;} /&gt;
+&lt;List&lt;number&gt; items={ages} renderItem={(a) =&gt; &lt;li&gt;{a}&lt;/li&gt;} /&gt;
+&lt;List&lt;User&gt; items={users} renderItem={(u) =&gt; &lt;li&gt;{u.name}&lt;/li&gt;} /&gt;</code></pre>
+          </section>
+
+          <!-- Lab -->
+          <section>
+            <h2>Lab: Componente List Genérico</h2>
+            <pre><code class="language-typescript">interface Entity { id: string; }
+interface Task extends Entity { title: string; description: string; status: string; }
+
+interface DataListProps&lt;T extends Entity&gt; {
+  data: T[];
+  renderItem: (item: T) =&gt; React.ReactNode;
+  keyExtractor?: (item: T) =&gt; string;
+}
+
+function DataList&lt;T extends Entity&gt;({ data, renderItem, keyExtractor = (item) =&gt; item.id }: DataListProps&lt;T&gt;) {
+  if (data.length === 0) return &lt;div&gt;No hay datos&lt;/div&gt;;
+
+  return (
+    &lt;ul&gt;
+      {data.map(item =&gt; (
+        &lt;li key={keyExtractor(item)}&gt;{renderItem(item)}&lt;/li&gt;
+      ))}
+    &lt;/ul&gt;
+  );
+}</code></pre>
+          </section>
         </section>
 
         <!-- SECCION 14: IDs Únicos -->
@@ -397,6 +869,53 @@ return (
     &lt;input id={id} /&gt;
   &lt;/div&gt;
 );</code></pre>
+          </section>
+
+          <!-- Utilidad -->
+          <section>
+            <h2>useId: Accesibilidad y SSR</h2>
+            <pre><code class="language-typescript">// ❌ ERROR: IDs hardcodeados en bucles (duplicados)
+{items.map(item =&gt; (
+  &lt;&gt;
+    &lt;label htmlFor="input"&gt;{item.name}&lt;/label&gt;
+    &lt;input id="input" /&gt;
+  &lt;/&gt;
+))}
+
+// ✅ CORRECTO: useId genera IDs únicos por render
+{items.map(item =&gt; {
+  const id = useId(); // ⚠️ No dentro de map (hook rule)
+  return (
+    &lt;&gt;
+      &lt;label htmlFor={id}&gt;{item.name}&lt;/label&gt;
+      &lt;input id={id} /&gt;
+    &lt;/&gt;
+  );
+})}</code></pre>
+          </section>
+
+          <!-- Lab -->
+          <section>
+            <h2>Lab: IDs Únicos en Componentes</h2>
+            <pre><code class="language-typescript">import { useId } from 'react';
+
+interface InputProps {
+  label: string;
+  type?: 'text' | 'email' | 'password';
+  value: string;
+  onChange: (value: string) =&gt; void;
+}
+
+function Input({ label, type = 'text', value, onChange }: InputProps) {
+  const id = useId();
+
+  return (
+    &lt;div&gt;
+      &lt;label htmlFor={id}&gt;{label}&lt;/label&gt;
+      &lt;input id={id} type={type} value={value} onChange={(e) =&gt; onChange(e.target.value)} /&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
           </section>
         </section>
 
