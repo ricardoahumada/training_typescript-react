@@ -227,6 +227,37 @@ const result = processItems([1, 2, 3], (x) => x * 2);</code></pre>
                         <li class="fragment">Implementa función que acepta filtros</li>
                     </ol>
                 </section>
+
+                <!-- Código Lab -->
+                <section>
+                    <h2>Código del Lab</h2>
+                    <pre><code class="language-typescript">type TaskFilter = (task: Task) => boolean;
+type TaskTransformer = (task: Task) => Task;
+
+function filterTasks(
+  tasks: Task[],
+  filterFn: TaskFilter
+): Task[] {
+  return tasks.filter(filterFn);
+}
+
+const highPriority = filterTasks(
+  tasks,
+  (task) => task.priority === "high"
+);
+
+function transformTasks(
+  tasks: Task[],
+  transformer: TaskTransformer
+): Task[] {
+  return tasks.map(transformer);
+}
+
+const markedAsDone = transformTasks(
+  pendingTasks,
+  (task) => ({ ...task, status: "completed" })
+);</code></pre>
+                </section>
             </section>
 
             <!-- ======================= TERCERA PÍLDORA → LAB ======================= -->

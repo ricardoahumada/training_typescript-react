@@ -1,32 +1,17 @@
-﻿// ============================================
-// Lab 1: Introducción a TypeScript
+// ============================================
+// Lab 6: Estructuras de Control
 // ============================================
 
-import { Task, TaskPriority, TaskStatus } from "./types/tasks";
+import { Task, TaskStatus, TaskPriority } from "./types/task";
+import { isCompleted, isAssigned, isHighPriority } from "./utils/typeGuards";
+import { filterTasks, getHighPriorityTasks, getCompletedTasks } from "./utils/taskFilters";
+import { getPriorityLevel, getPriorityDescription, getPriorityColor, sortByPriority } from "./utils/priority";
 
-/* FILTRADO DE TAREAS */
+console.log("=== Lab 6: Estructuras de Control ===\n");
 
-function isCompleted(task: Task): boolean {
-  return task.status === "completed";
-}
-
-function isAssigned(task: Task): task is Task & { assigneeId: string } {
-  return task.assigneeId !== undefined;
-}
-
-function filterTasks(
-  tasks: Task[],
-  filter: {
-    status?: TaskStatus;
-    priority?: TaskPriority;
-  },
-): Task[] {
-  return tasks.filter((task) => {
-    if (filter.status && task.status !== filter.status) return false;
-    if (filter.priority && task.priority !== filter.priority) return false;
-    return true;
-  });
-}
+// ============================================
+// Datos de prueba
+// ============================================
 
 const tareas: Task[] = [
   {
@@ -35,7 +20,7 @@ const tareas: Task[] = [
     description: "Completar el módulo 6",
     status: "inProgress",
     priority: "high",
-    createdAt: new Date(),
+    createdAt: new Date()
   },
   {
     id: "2",
@@ -44,7 +29,7 @@ const tareas: Task[] = [
     status: "completed",
     priority: "medium",
     assigneeId: "user-1",
-    createdAt: new Date(),
+    createdAt: new Date()
   },
   {
     id: "3",
@@ -53,7 +38,7 @@ const tareas: Task[] = [
     status: "pending",
     priority: "critical",
     assigneeId: "user-2",
-    createdAt: new Date(),
+    createdAt: new Date()
   },
   {
     id: "4",
@@ -61,7 +46,7 @@ const tareas: Task[] = [
     description: "Sin asignación",
     status: "pending",
     priority: "low",
-    createdAt: new Date(),
+    createdAt: new Date()
   },
   {
     id: "5",
@@ -70,36 +55,73 @@ const tareas: Task[] = [
     status: "inProgress",
     priority: "medium",
     assigneeId: "user-1",
-    createdAt: new Date(),
-  },
+    createdAt: new Date()
+  }
 ];
 
-const listaf = filterTasks(tareas, { status: "completed" });
-console.log(listaf);
+// ============================================
+// Type Guards
+// ============================================
 
-const listaf2 = filterTasks(tareas, { status: "completed", priority: "high" });
-console.log(listaf);
+console.log("--- Type Guards ---");
 
-console.log(isAssigned(tareas[0]));
+// isCompleted
+const tareaCompletada = tareas.find(t => isCompleted(t));
+console.log("Primera tarea completada:", tareaCompletada?.title);
 
-// ----
+// isAssigned
+const tareasAsignadas = tareas.filter(isAssigned);
+console.log("Tareas asignadas:", tareasAsignadas.length);
 
-type Status = "pending" | "approved" | "rejected";
+// isHighPriority
+const tareasUrgentes = tareas.filter(isHighPriority);
+console.log("Tareas de alta prioridad:", tareasUrgentes.map(t => t.title));
 
-// ...
+// ============================================
+// Filtros
+// ============================================
 
-function getStatusColor(status: Status): string {
-  switch (status) {
-    case "pending":
-      return "yellow";
-    case "approved":
-      return "green";
-    case "rejected":
-      return "red";
-    default:
-      // Exhaustiveness check
-      const _exhaustive: never = status;
-      throw new Error(`Unknown status: ${status}`);
-  }
+console.log("\n--- Filtros ---");
+
+// Filtrar por estado
+const pendientes = filterTasks(tareas, { status: "pending" });
+console.log("Tareas pendientes:", pendientes.length);
+
+// Filtrar por prioridad
+const criticas = filterTasks(tareas, { priority: "critical" });
+console.log("Tareas críticas:", criticas.map(t => t.title));
+
+// Filtrar combinando
+const asignadasAltaPrioridad = filterTasks(tareas, { 
+  assigned: true, 
+  priority: "high" 
+});
+console.log("Asignadas de alta prioridad:", asignadasAltaPrioridad.map(t => t.title));
+
+// ============================================
+// Switch Exhaustivo
+// ============================================
+
+console.log("\n--- Switch Exhaustivo ---");
+
+for (const prioridad of ["low", "medium", "high", "critical"] as TaskPriority[]) {
+  console.log(`${prioridad}: nivel ${getPriorityLevel(prioridad)} - ${getPriorityDescription(prioridad)}`);
 }
 
+// ============================================
+// Utilidades de Prioridad
+// ============================================
+
+console.log("\n--- Utilidades de Prioridad ---");
+
+const tareaEjemplo = tareas[2]; // La tarea crítica
+console.log(`Color para prioridad "${tareaEjemplo.priority}":`, getPriorityColor(tareaEjemplo.priority));
+
+// Ordenar por prioridad
+const ordenadas = sortByPriority(tareas);
+console.log("\nTareas ordenadas por prioridad:");
+ordenadas.forEach((t, i) => {
+  console.log(`  ${i + 1}. [${t.priority.toUpperCase()}] ${t.title}`);
+});
+
+console.log("\n=== Lab 6 Completado ===");

@@ -1,3 +1,7 @@
+// ============================================
+// Tipos del Sistema de Tareas - Módulo 6
+// ============================================
+
 export type TaskStatus = "pending" | "inProgress" | "completed";
 export type TaskPriority = "low" | "medium" | "high" | "critical";
 
@@ -10,4 +14,10 @@ export interface Task {
   assigneeId?: string;
   createdAt: Date;
   completedAt?: Date;
+}
+
+export interface TaskFilter {
+  status?: TaskStatus;
+  priority?: TaskPriority;
+  assigned?: boolean;
 }

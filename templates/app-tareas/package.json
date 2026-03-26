@@ -1,15 +1,13 @@
 {
-  "name": "@course/module-01",
+  "name": "@course/module-06",
   "version": "1.0.0",
-  "description": "Lab 1: Introducción a TypeScript - Tipos base",
+  "description": "Lab 6: Estructuras de Control - Expande module-05",
   "main": "dist/index.js",
   "scripts": {
     "dev": "ts-node src/index.ts",
     "build": "tsc",
-    "start": "node dist/index.js",
-    "test": "ts-node src/index.ts"
+    "start": "node dist/index.js"
   },
-  "dependencies": {},
   "devDependencies": {
     "@types/node": "^20.10.0",
     "ts-node": "^10.9.2",
