@@ -1,53 +1,34 @@
-const path = require("path");
-const webpack = require('webpack'); 
-const HtmlWebpackPlugin = require("html-webpack-plugin");
-// const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer'); //BundleAnalyzer
+// ============================================================
+// webpack.config.js - Lab 3A: Configuracion de Bundling
+// ============================================================
+//
+// TODO: Completar esta configuracion siguiendo los pasos del Lab 3A
+//
+// PASOS:
+// 1. Configurar entry point (./src/index.tsx)
+// 2. Configurar output (dist/, filename con contenthash)
+// 3. Configurar resolve (extensions: .tsx, .ts, .js)
+// 4. Configurar module.rules para ts-loader y css-loader
+// 5. Configurar plugins (HtmlWebpackPlugin)
+// 6. Configurar devServer (puerto 3000, hot reload)
+// 7. Configurar alias (@/ para src/)
+//
+// HISTORICO DE EVs:
+// - Lab 3A: Webpack CSR (este archivo)
+// - Lab 5A: Next.js SSR (se creara next.config.js)
+// - Lab 12A: Vitest (se creara vitest.config.ts)
+// - Lab 12B: Playwright (se creara playwright.config.ts)
 
 module.exports = {
-  entry: "./src/index.tsx",
-  output: {
-    path: path.resolve(__dirname, "dist"),
-    filename: "bundle.[contenthash].js",
-    clean: true,
-  },
-  resolve: {
-    extensions: [".tsx", ".ts", ".js", ".jsx"],
-  },
-  module: {
-    rules: [
-      {
-        test: /\.tsx?$/,
-        exclude: /node_modules/,
-        use: {
-          loader: "ts-loader", // -> esbuild-loader -> descomentar options
-          // options: {
-          //   loader: "tsx",
-          //   target: "es2020",
-          // },
-        },
-      },
-      {
-        test: /\.css$/,
-        use: ["style-loader", "css-loader"],
-      },
-    ],
-  },
-  plugins: [
-    new HtmlWebpackPlugin({
-      template: "./public/index.html",
-      title: "Sistema de Tareas - React",
-    }),
-    new webpack.HotModuleReplacementPlugin(), // HotModuleReolacement,
-    //BundleAnalyzer
-    // new BundleAnalyzerPlugin({ 
-    //   analyzerMode: 'static',    // 'server' = abre navegador, 'static' = genera HTML
-    //   openAnalyzer: true,         // Abrir automáticamente
-    //   reportFilename: 'bundle-report.html',
-    // }),
-  ],
-  devServer: {
-    static: "./dist",
-    hot: false, // HotModuleReolacement: true
-    port: 3000,
-  },
+  // === COMPLETAR EN LAB 3A ===
+
+  // entry:
+  // output:
+  // resolve:
+  // module:
+  // plugins:
+  // devServer:
+
+  // Mode: development o production
+  mode: 'development',
 };

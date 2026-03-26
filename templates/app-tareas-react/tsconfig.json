@@ -1,19 +1,40 @@
 {
   "compilerOptions": {
-    "target": "ES2020",
-    "lib": ["DOM", "DOM.Iterable", "ES2020"],
-    "module": "ESNext",
-    "moduleResolution": "bundler",
-    "jsx": "react-jsx",
-    "strict": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "noEmit": false,
-    "outDir": "./dist",
-    "baseUrl": "./src"
+    // === COMPLETAR EN LAB 3A ===
+
+    // TODO: Configurar target (ES2020 para React 18)
+    // target:
+
+    // TODO: Configurar lib para incluir DOM y ES2020
+    // lib: []
+
+    // TODO: Configurar module (ESNext o commonjs)
+    // module:
+
+    // TODO: Configurar moduleResolution (node o bundler)
+    // moduleResolution:
+
+    // TODO: Configurar jsx para React (react-jsx)
+    // jsx:
+
+    // strict: true,
+
+    // TODO: Configurar esModuleInterop (true)
+    // esModuleInterop:
+
+    // TODO: Configurar skipLibCheck (true)
+    // skipLibCheck:
+
+    // TODO: Configurar forceConsistentCasingInFileNames (true)
+    // forceConsistentCasingInFileNames:
+
+    // TODO: Configurar resolveJsonModule (true)
+    // resolveJsonModule:
+
+    // outDir: "./dist"
+
+    // === PARA LAB 4A (React con types) ===
+    // Lab 4A agregara: types/react, utility types
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]
