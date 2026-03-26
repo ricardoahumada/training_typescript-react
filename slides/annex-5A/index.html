@@ -142,6 +142,21 @@
             </ul>
           </section>
 
+          <!-- Utilidad -->
+          <section>
+            <h2>ROI: Casos donde Next.js brilla</h2>
+            <table>
+              <tr><th>Caso</th><th>Por qué Next.js</th></tr>
+              <tr><td>E-commerce</td><td>SEO crítico, contenido dinámico, metadata dinámica</td></tr>
+              <tr><td>Blogs/Noticias</td><td>SSG + ISR para velocidad + contenido frecuente</td></tr>
+              <tr><td>Dashboards</td><td>Client components para interactividad</td></tr>
+              <tr><td>Landing pages</td><td>SSG instantáneo, metadata automática</td></tr>
+            </table>
+            <div class="block-success">
+              <p><strong>ROI:</strong> Deploy zero-config con Vercel, Netlify. curva de aprendizaje mínima (ya sabes React).</p>
+            </div>
+          </section>
+
           <section>
             <h2>Crear proyecto Next.js</h2>
             <pre><code class="language-bash">npx create-next-app@latest my-app --typescript</code></pre>
@@ -149,15 +164,12 @@
 
           <section>
             <h2>Lab: Crear proyecto Next.js básico</h2>
-            <div class="block-info">
-              <p><strong>Objetivo:</strong> Crear una app Next.js con SSR desde cero</p>
-            </div>
-            <ol>
-              <li class="fragment">Ejecutar npx create-next-app@latest</li>
-              <li class="fragment">Configurar: App Router, TypeScript</li>
-              <li class="fragment">Ejecutar npm run dev</li>
-              <li class="fragment">Verificar View Source en navegador</li>
-            </ol>
+            <pre><code class="language-bash"># Crear proyecto Next.js con TypeScript
+npx create-next-app@latest tareas-ssr --typescript --app --src-dir --import-alias "@/*"
+
+cd tareas-ssr
+npm run dev
+# http://localhost:3000</code></pre>
           </section>
         </section>
 
@@ -189,16 +201,44 @@
       → NO → Server Component (por defecto)</code></pre>
           </section>
 
+          <!-- Utilidad -->
+          <section>
+            <h2>Server vs Client: Beneficios Concretos</h2>
+            <table>
+              <tr><th>Aspecto</th><th>Server</th><th>Client</th></tr>
+              <tr><td>SEO</td><td>✅ Automatico</td><td>❌ Requiere cliente</td></tr>
+              <tr><td>Acceso BD/FS</td><td>✅ Directo</td><td>❌ Via API</td></tr>
+              <tr><td>Bundle size</td><td>✅ 0 KB JS</td><td>❌ Todo el codigo</td></tr>
+              <tr><td>Interactividad</td><td>❌ No</td><td>✅ Completa</td></tr>
+              <tr><td>Time to interactive</td><td>✅ Inmediato</td><td>❌ Espera JS</td></tr>
+            </table>
+            <div class="block-tip">
+              <p><strong>Tip:</strong> Usa Server por defecto. Solo cambia a Client cuando NECESITES hooks o eventos.</p>
+            </div>
+          </section>
+
           <section>
             <h2>Lab: Migrar componente a Server Component</h2>
-            <div class="block-info">
-              <p><strong>Objetivo:</strong> Convertir un componente de SPA en Server Component</p>
-            </div>
-            <ol>
-              <li class="fragment">Analizar qué necesita el componente</li>
-              <li class="fragment">Si no tiene interactividad → Server Component</li>
-              <li class="fragment">Si tiene useState/useEffect → 'use client'</li>
-            </ol>
+            <pre><code class="language-typescript">// ✅ Server Component (sin interactividad)
+// app/components/TaskList.tsx
+export default async function TaskList() {
+  const tasks = await db.query('SELECT * FROM tasks');
+  return (
+    &lt;ul&gt;
+      {tasks.map(task =&gt; &lt;li key={task.id}&gt;{task.title}&lt;/li&gt;)}
+    &lt;/ul&gt;
+  );
+}
+
+// ❌ Client Component (con useState)
+// app/components/Counter.tsx
+'use client';
+import { useState } from 'react';
+
+export default function Counter() {
+  const [count, setCount] = useState(0);
+  return &lt;button onClick={() =&gt; setCount(c =&gt; c + 1)}&gt;{count}&lt;/button&gt;;
+}</code></pre>
           </section>
         </section>
 
@@ -235,16 +275,47 @@ export async function POST(request: NextRequest) {
 }</code></pre>
           </section>
 
+          <!-- Utilidad -->
+          <section>
+            <h2>Pages vs API Routes: Cuándo usar cada uno</h2>
+            <table>
+              <tr><th>Aspecto</th><th>Pages</th><th>API Routes</th></tr>
+              <tr><td>Proposito</td><td>Renderizar UI</td><td>Manejar requests</td></tr>
+              <tr><td>Returns</td><td>HTML/JSX</td><td>JSON</td></tr>
+              <tr><td>Browser</td><td>Directo</td><td>Via fetch</td></tr>
+              <tr><td>SEO</td><td>Indexable</td><td>No indexable</td></tr>
+            </table>
+            <div class="block-success">
+              <p><strong>Regla:</strong> Pages para UI. API Routes para logic (CRUD, auth, webhooks).</p>
+            </div>
+          </section>
+
           <section>
             <h2>Lab: Crear rutas y API en Next.js</h2>
-            <div class="block-info">
-              <p><strong>Objetivo:</strong> Crear routing y API para la app de tareas</p>
-            </div>
-            <ol>
-              <li class="fragment">Crear app/tasks/page.tsx</li>
-              <li class="fragment">Crear app/tasks/[id]/page.tsx</li>
-              <li class="fragment">Crear app/api/tasks/route.ts</li>
-            </ol>
+            <pre><code class="language-typescript">// app/tasks/page.tsx - Lista de tareas
+export default async function TasksPage() {
+  const tasks = await fetch('http://localhost:3000/api/tasks').then(r => r.json());
+  return &lt;div&gt;{tasks.map(t =&gt; &lt;TaskItem key={t.id} task={t} /&gt;)}&lt;/div&gt;;
+}
+
+// app/tasks/[id]/page.tsx - Detalle de tarea
+interface PageProps { params: Promise<{ id: string }>; }
+export default async function TaskPage({ params }: PageProps) {
+  const { id } = await params;
+  const task = await fetch(`/api/tasks/${id}`).then(r => r.json());
+  return &lt;TaskDetail task={task} /&gt;;
+}
+
+// app/api/tasks/route.ts - API GET/POST
+export async function GET() {
+  const tasks = await db.getTasks();
+  return NextResponse.json(tasks);
+}
+export async function POST(request: Request) {
+  const body = await request.json();
+  const created = await db.createTask(body);
+  return NextResponse.json(created, { status: 201 });
+}</code></pre>
           </section>
         </section>
 
@@ -280,16 +351,54 @@ export default async function TasksPage({ searchParams }: PageSearchParams) {
 }</code></pre>
           </section>
 
+          <!-- Utilidad -->
+          <section>
+            <h2>Tipado: Por qué importa en Server Components</h2>
+            <table>
+              <tr><th>Sin tipos</th><th>Con tipos</th></tr>
+              <tr><td>params.id puede ser string | undefined</td><td>params.id es string</td></tr>
+              <tr><td>task.title puede fallar en runtime</td><td>task.title es string</td></tr>
+              <tr><td>Refactoring peligroso</td><td>Refactoring seguro</td></tr>
+              <tr><td>searchParams sin autocomplete</td><td>searchParams con autocomplete</td></tr>
+            </table>
+            <div class="block-success">
+              <p><strong>Beneficio:</strong> Errores en build, no en production. DX mejorado con autocomplete.</p>
+            </div>
+          </section>
+
           <section>
             <h2>Lab: Tipar Server Components</h2>
-            <div class="block-info">
-              <p><strong>Objetivo:</strong> Crear Server Components con tipos correctos</p>
-            </div>
-            <ol>
-              <li class="fragment">Crear página con params tipados</li>
-              <li class="fragment">Añadir searchParams</li>
-              <li class="fragment">Verificar sin errores de TypeScript</li>
-            </ol>
+            <pre><code class="language-typescript">// app/tasks/[id]/page.tsx - Tipado completo
+import { getTask } from '@/lib/tasks';
+
+interface PageProps {
+  params: Promise<{ id: string }>;
+}
+
+export default async function TaskPage({ params }: PageProps) {
+  const { id } = await params;
+  const task = await getTask(id);
+
+  if (!task) notFound();
+
+  return (
+    &lt;div&gt;
+      &lt;h1&gt;{task.title}&lt;/h1&gt;
+      &lt;p&gt;{task.description}&lt;/p&gt;
+    &lt;/div&gt;
+  );
+}
+
+// app/tasks/page.tsx - con searchParams
+interface TasksPageProps {
+  searchParams: Promise<{ status?: string; page?: string }>;
+}
+
+export default async function TasksPage({ searchParams }: TasksPageProps) {
+  const { status, page } = await searchParams;
+  const tasks = await getTasks({ status, page: Number(page) || 1 });
+  return &lt;TaskList tasks={tasks} /&gt;;
+}</code></pre>
           </section>
         </section>
 
@@ -321,16 +430,55 @@ async function getTasks(): Promise&lt;Task[]&gt; {
             </div>
           </section>
 
+          <!-- Utilidad -->
+          <section>
+            <h2>Fetch + Zod: Por qué mejor que any</h2>
+            <pre><code class="language-typescript">// ❌ Con any - sin validación, sin tipos
+const data: any = await fetch('/api/tasks').then(r => r.json());
+data.title.toUpperCase(); // Puede fallar en runtime!
+
+// ✅ Con Zod - validación + tipos
+const data = await fetch('/api/tasks')
+  .then(r => r.json())
+  .then(data => TaskSchema.array().parse(data));
+data[0].title.toUpperCase(); // Type-safe!</code></pre>
+            <table>
+              <tr><th>Aspecto</th><th>any</th><th>Zod</th></tr>
+              <tr><td>Validación</td><td>❌ No</td><td>✅ Sí</td></tr>
+              <tr><td>Errores</td><td>Runtime</td><td>Build time</td></tr>
+              <tr><td>Autocomplete</td><td>❌ No</td><td>✅ Sí</td></tr>
+            </table>
+          </section>
+
           <section>
             <h2>Lab: Data Fetching Tipado con Zod</h2>
-            <div class="block-info">
-              <p><strong>Objetivo:</strong> Implementar fetch y API routes con tipos y validación Zod</p>
-            </div>
-            <ol>
-              <li class="fragment">Instalar Zod</li>
-              <li class="fragment">Crear tipos en types/task.ts</li>
-              <li class="fragment">Crear API route con validación</li>
-            </ol>
+            <pre><code class="language-typescript">// types/task.ts
+import { z } from 'zod';
+
+export const TaskSchema = z.object({
+  id: z.number(),
+  title: z.string().min(1).max(100),
+  status: z.enum(['pending', 'inProgress', 'completed']),
+  priority: z.enum(['low', 'medium', 'high']),
+});
+
+export type Task = z.infer&lt;typeof TaskSchema&gt;;
+export type CreateTaskInput = z.infer&lt;typeof CreateTaskSchema&gt;;
+
+// lib/api.ts
+export async function getTasks() {
+  const res = await fetch('/api/tasks');
+  const data = await res.json();
+  return TaskSchema.array().parse(data); // throw if invalid
+}
+
+export async function createTask(input: CreateTaskInput) {
+  const res = await fetch('/api/tasks', {
+    method: 'POST',
+    body: JSON.stringify(input),
+  });
+  return TaskSchema.parse(await res.json());
+}</code></pre>
           </section>
         </section>
 
@@ -364,16 +512,48 @@ export default function Page() {
 }</code></pre>
           </section>
 
+          <!-- Utilidad -->
+          <section>
+            <h2>Streaming: Mejora UX en aplicaciones reales</h2>
+            <table>
+              <tr><th>Sin Streaming</th><th>Con Streaming</th></tr>
+              <tr><td>Pagina en blanco hasta que TODO cargue</td><td>Contenido aparece progresivamente</td></tr>
+              <tr><td>Usuario espera 3-5s sin feedback</td><td>Skeleton muestra progreso</td></tr>
+              <tr><td>Alta tasa de rebote</td><td>Usuario ve contenido parcial antes</td></tr>
+            </table>
+            <div class="block-success">
+              <p><strong>Caso real:</strong> E-commerce con 100 productos. Sin streaming: 5s de espera. Con streaming: productos aparecen en 500ms.</p>
+            </div>
+          </section>
+
           <section>
             <h2>Lab: Implementar Streaming y Suspense</h2>
-            <div class="block-info">
-              <p><strong>Objetivo:</strong> Añadir loading, error, not-found y Suspense</p>
-            </div>
-            <ol>
-              <li class="fragment">Crear app/tasks/loading.tsx</li>
-              <li class="fragment">Crear app/tasks/error.tsx</li>
-              <li class="fragment">Crear app/tasks/not-found.tsx</li>
-            </ol>
+            <pre><code class="language-typescript">// app/tasks/loading.tsx
+export default function Loading() {
+  return &lt;div className="skeleton"&gt;{Array(5).fill(&lt;div className="skeleton-row" /&gt;)}&lt;/div&gt;;
+}
+
+// app/tasks/error.tsx
+'use client';
+export default function Error({ error }: { error: Error }) {
+  return &lt;div&gt;Error: {error.message}&lt;/div&gt;;
+}
+
+// app/tasks/not-found.tsx
+export default function NotFound() {
+  return &lt;div&gt;Task not found&lt;/div&gt;;
+}
+
+// app/tasks/page.tsx - con Suspense
+import { Suspense } from 'react';
+
+export default function TasksPage() {
+  return (
+    &lt;Suspense fallback={&lt;Loading /&gt;}&gt;
+      &lt;TaskList /&gt;
+    &lt;/Suspense&gt;
+  );
+}</code></pre>
           </section>
         </section>
 
@@ -410,16 +590,50 @@ export const metadata: Metadata = {
 }</code></pre>
           </section>
 
+          <!-- Utilidad -->
+          <section>
+            <h2>Metadata API: Impacto en SEO y Compartición</h2>
+            <table>
+              <tr><th>Sin Metadata</th><th>Con Metadata</th></tr>
+              <tr><td>Google muestra "untitled" o URL</td><td>Google muestra título descriptivo</td></tr>
+              <tr><td>No hay descripción en resultados</td><td>Descripción personalizada</td></tr>
+              <tr><td>Links no tienen preview</td><td>OpenGraph con imagen y descripción</td></tr>
+              <tr><td>Redes sociales muestran URL</td><td>Cards con imagen y título</td></tr>
+            </table>
+            <div class="block-success">
+              <p><strong>ROI:</strong> +30% CTR en resultados de búsqueda con metadata rica.</p>
+            </div>
+          </section>
+
           <section>
             <h2>Lab: Metadata API con Tipos</h2>
-            <div class="block-info">
-              <p><strong>Objetivo:</strong> Implementar metadata estática y dinámica</p>
-            </div>
-            <ol>
-              <li class="fragment">Añadir metadata en layout.tsx</li>
-              <li class="fragment">Añadir generateMetadata en páginas</li>
-              <li class="fragment">Verificar en DevTools</li>
-            </ol>
+            <pre><code class="language-typescript">// app/layout.tsx - Metadata global
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Task Manager SSR',
+  description: 'App de tareas con Server Side Rendering',
+};
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return &lt;html&gt;&lt;body&gt;{children}&lt;/body&gt;&lt;/html&gt;;
+}
+
+// app/tasks/[id]/page.tsx - Metadata dinámica
+interface Props { params: Promise<{ id: string }>; }
+
+export async function generateMetadata({ params }: Props): Promise&lt;Metadata&gt; {
+  const { id } = await params;
+  const task = await getTask(id);
+
+  return {
+    title: task ? `${task.title} | Task Manager` : 'Task not found',
+    openGraph: {
+      title: task?.title ?? 'Not found',
+      description: task?.description,
+    },
+  };
+}</code></pre>
           </section>
         </section>
 
@@ -442,16 +656,67 @@ export const metadata: Metadata = {
 }</code></pre>
           </section>
 
+          <!-- Utilidad -->
+          <section>
+            <h2>API Routes vs Backend Externo: Cuándo elegir</h2>
+            <table>
+              <tr><th>Aspecto</th><th>API Routes (Next.js)</th><th>Backend Externo</th></tr>
+              <tr><td>Deploy</td><td>Zero-config con Next.js</td><td>Necesita servidor propio</td></tr>
+              <tr><td>Microservicios</td><td>Uno por funcionalidad</td><td>Arquitectura distribuida</td></tr>
+              <tr><td>Escalabilidad</td><td>Escala con Next.js</td><td>Escala independientemente</td></tr>
+              <tr><td>Casos simples</td><td>✅ CRUD rápido</td><td>❌ Overkill</td></tr>
+              <tr><td>Casos complejos</td><td>❌ Limitado</td><td>✅ Flexible</td></tr>
+            </table>
+            <div class="block-tip">
+              <p><strong>Regla:</strong> Empieza con API Routes. Migra a backend externo cuando la lógica sea muy compleja o necesites servicios específicos.</p>
+            </div>
+          </section>
+
           <section>
             <h2>Lab: API Routes Completos</h2>
-            <div class="block-info">
-              <p><strong>Objetivo:</strong> Crear API routes con headers, cookies, query params y validación</p>
-            </div>
-            <ol>
-              <li class="fragment">Crear app/api/tasks/route.ts</li>
-              <li class="fragment">Crear app/api/tasks/[id]/route.ts</li>
-              <li class="fragment">Probar endpoints</li>
-            </ol>
+            <pre><code class="language-typescript">// app/api/tasks/route.ts
+export async function GET(request: NextRequest) {
+  const { searchParams } = new URL(request.url);
+  const status = searchParams.get('status');
+  const page = Number(searchParams.get('page') || 1);
+
+  const tasks = await getTasks({ status, page });
+  return NextResponse.json(tasks);
+}
+
+export async function POST(request: NextRequest) {
+  const body = await request.json();
+  const result = CreateTaskSchema.safeParse(body);
+
+  if (!result.success) {
+    return NextResponse.json({ error: result.error }, { status: 400 });
+  }
+
+  const task = await createTask(result.data);
+  return NextResponse.json(task, { status: 201 });
+}
+
+// app/api/tasks/[id]/route.ts
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const task = await getTask(id);
+
+  if (!task) return NextResponse.json({ error: 'Not found' }, { status: 404 });
+  return NextResponse.json(task);
+}
+
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const body = await request.json();
+  const updated = await updateTask(id, body);
+  return NextResponse.json(updated);
+}
+
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  await deleteTask(id);
+  return new NextResponse(null, { status: 204 });
+}</code></pre>
           </section>
         </section>
 
