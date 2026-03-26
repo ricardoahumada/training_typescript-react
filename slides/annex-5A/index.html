@@ -78,6 +78,7 @@
 
           <section>
             <h2>Escenario: "Se renderiza en el back"</h2>
+            <p>El cliente dice esto pero usualmente significa que usa Webpack, que solo empaqueta JS. SSR real necesita un framework que ejecute React en el servidor.</p>
             <p><strong>La confusión común:</strong></p>
             <ul>
               <li>"Uso Webpack" → pero Webpack solo empaqueta, NO hace SSR</li>
@@ -91,6 +92,7 @@
 
           <section>
             <h2>Webpack != SSR</h2>
+            <p>Webpack es un bundler, no un framework. Solo empaqueta archivos, no ejecuta React en servidor.</p>
             <table>
               <tr><th>Herramienta</th><th>Tipo</th><th>Hace SSR?</th></tr>
               <tr><td>Webpack</td><td>Bundler</td><td>NO</td></tr>
@@ -111,6 +113,7 @@
 
           <section>
             <h2>Cuándo Migrar a Next.js</h2>
+            <p>Señales claras para migrar: SEO importante, contenido dinámico frecuente, primer paint lento.</p>
             <table>
               <tr><th>Señal</th><th>Acción</th></tr>
               <tr><td>Contenido cambia frecuentemente</td><td>Migrar a SSR</td></tr>
@@ -133,6 +136,7 @@
 
           <section>
             <h2>¿Por qué Next.js?</h2>
+            <p>Framework más popular con App Router, API routes integradas, y deploy zero-config con Vercel.</p>
             <ul>
               <li>Más popular (20M+ descargas/semana)</li>
               <li>Usa Webpack internamente (o Turbopack)</li>
@@ -145,6 +149,7 @@
           <!-- Utilidad -->
           <section>
             <h2>ROI: Casos donde Next.js brilla</h2>
+            <p>E-commerce, blogs, y landing pages se benefician más por SEO y velocidad.</p>
             <table>
               <tr><th>Caso</th><th>Por qué Next.js</th></tr>
               <tr><td>E-commerce</td><td>SEO crítico, contenido dinámico, metadata dinámica</td></tr>
@@ -159,6 +164,7 @@
 
           <section>
             <h2>Crear proyecto Next.js</h2>
+            <p>Comando `npx create-next-app` configura todo: TypeScript, App Router, y estructura de carpetas.</p>
             <pre><code class="language-bash">npx create-next-app@latest my-app --typescript</code></pre>
           </section>
 
@@ -182,6 +188,7 @@ npm run dev
 
           <section>
             <h2>La regla de oro</h2>
+            <p>Server Components por defecto. Solo usar 'use client' cuando necesites hooks o eventos.</p>
             <p>En Next.js App Router, los componentes son Server Components por defecto.</p>
             <table>
               <tr><th>Característica</th><th>Server</th><th>Client</th></tr>
@@ -194,6 +201,7 @@ npm run dev
 
           <section>
             <h2>Árbol de decisiones</h2>
+            <p>Pregúntate: ¿tiene interactividad? ¿accede a BD/FS? Responde las preguntas para saber qué tipo de componente usar.</p>
             <pre><code class="language-text">¿Tiene interactividad? (useState, onClick)
   → SI → Client Component ('use client')
   → NO → ¿Accede a BD/FS?
@@ -204,6 +212,7 @@ npm run dev
           <!-- Utilidad -->
           <section>
             <h2>Server vs Client: Beneficios Concretos</h2>
+            <p>Server: SEO automático, acceso directo a BD, 0KB JS. Client: interactividad completa.</p>
             <table>
               <tr><th>Aspecto</th><th>Server</th><th>Client</th></tr>
               <tr><td>SEO</td><td>✅ Automatico</td><td>❌ Requiere cliente</td></tr>
@@ -251,6 +260,7 @@ export default function Counter() {
 
           <section>
             <h2>Routing: app/tasks/[id]/page.tsx</h2>
+            <p>El App Router usa archivos para definir rutas. Los parámetros vienen en `params` (promesa en Next.js 15+).</p>
             <pre><code class="language-typescript">interface PageParams {
   params: { id: string };
 }
@@ -263,6 +273,7 @@ export default async function TaskPage({ params }: PageParams) {
 
           <section>
             <h2>Route Handlers: app/api/tasks/route.ts</h2>
+            <p>API Routes permiten crear endpoints REST directamente en Next.js.</p>
             <pre><code class="language-typescript">export async function GET() {
   const tasks = await getTasks();
   return NextResponse.json(tasks);
@@ -278,6 +289,7 @@ export async function POST(request: NextRequest) {
           <!-- Utilidad -->
           <section>
             <h2>Pages vs API Routes: Cuándo usar cada uno</h2>
+            <p>Pages para UI (SEO). API Routes para lógica (CRUD, auth, webhooks).</p>
             <table>
               <tr><th>Aspecto</th><th>Pages</th><th>API Routes</th></tr>
               <tr><td>Proposito</td><td>Renderizar UI</td><td>Manejar requests</td></tr>
@@ -328,6 +340,7 @@ export async function POST(request: Request) {
 
           <section>
             <h2>Params como Promise (Next.js 15+)</h2>
+            <p>En Next.js 15+, `params` es una Promise que debe resolverse con `await`.</p>
             <pre><code class="language-typescript">interface PageProps {
   params: Promise<{ id: string }>;
 }
@@ -341,6 +354,7 @@ export default async function TaskPage({ params }: PageProps) {
 
           <section>
             <h2>SearchParams tipado</h2>
+            <p>searchParams también es Promise. Tipalo para evitar errores en runtime.</p>
             <pre><code class="language-typescript">interface PageSearchParams {
   searchParams: Promise<{ page?: string; filter?: string }>;
 }
@@ -354,6 +368,7 @@ export default async function TasksPage({ searchParams }: PageSearchParams) {
           <!-- Utilidad -->
           <section>
             <h2>Tipado: Por qué importa en Server Components</h2>
+            <p>Los tipos dan seguridad en refactoring, autocompletado en el IDE, y errores en build no en producción.</p>
             <table>
               <tr><th>Sin tipos</th><th>Con tipos</th></tr>
               <tr><td>params.id puede ser string | undefined</td><td>params.id es string</td></tr>
@@ -411,6 +426,7 @@ export default async function TasksPage({ searchParams }: TasksPageProps) {
 
           <section>
             <h2>Fetch tipado + Zod</h2>
+            <p>Un solo schema Zod define tipos y validación. Útil para compartir tipos entre frontend y backend.</p>
             <pre><code class="language-typescript">import { z } from 'zod';
 
 const TaskSchema = z.object({
@@ -491,6 +507,7 @@ export async function createTask(input: CreateTaskInput) {
 
           <section>
             <h2>Archivos especiales</h2>
+            <p>Next.js reconoce estos archivos automáticamente: loading.tsx, error.tsx, not-found.tsx.</p>
             <table>
               <tr><th>Archivo</th><th>Cuando se muestra</th></tr>
               <tr><td>loading.tsx</td><td>Mientras carga la página</td></tr>
@@ -501,6 +518,7 @@ export async function createTask(input: CreateTaskInput) {
 
           <section>
             <h2>Suspense</h2>
+            <p>Suspense permite mostrar contenido de fallback mientras los componentes asíncronos cargan.</p>
             <pre><code class="language-typescript">import { Suspense } from 'react';
 
 export default function Page() {
@@ -515,6 +533,7 @@ export default function Page() {
           <!-- Utilidad -->
           <section>
             <h2>Streaming: Mejora UX en aplicaciones reales</h2>
+            <p>El contenido aparece progresivamente en lugar de esperar a que todo cargue. Reduce la tasa de rebote.</p>
             <table>
               <tr><th>Sin Streaming</th><th>Con Streaming</th></tr>
               <tr><td>Pagina en blanco hasta que TODO cargue</td><td>Contenido aparece progresivamente</td></tr>
@@ -580,6 +599,7 @@ export const metadata: Metadata = {
 
           <section>
             <h2>Metadata dinámica</h2>
+            <p>generateMetadata permite crear títulos y descripciones únicos para cada página dinámicamente.</p>
             <pre><code class="language-typescript">export async function generateMetadata({ params }: Props): Promise&lt;Metadata&gt; {
   const { id } = await params;
   const task = await getTask(id);
@@ -646,6 +666,7 @@ export async function generateMetadata({ params }: Props): Promise&lt;Metadata&g
 
           <section>
             <h2>Headers, Cookies y Query Params</h2>
+            <p>Las API Routes acceden a headers, cookies y query params a través del objeto NextRequest.</p>
             <pre><code class="language-typescript">export async function GET(request: NextRequest) {
   const authHeader = request.headers.get('authorization');
   const sessionCookie = request.cookies.get('session');

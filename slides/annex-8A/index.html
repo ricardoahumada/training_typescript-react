@@ -299,6 +299,7 @@ type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;</code><
 
           <section>
             <h2>¿Por qué tipar el contexto?</h2>
+            <p>El Context API permite compartir estado global, pero sin tipos es fácil cometer errores que solo aparecen en runtime.</p>
             <ul>
               <li>Evita errores de tipo al acceder al contexto</li>
               <li>Proporciona autocompletado en el IDE</li>
@@ -359,14 +360,40 @@ interface TaskState {
   selectedTask: Task | null;
 }
 
-interface TaskContextValue extends TaskState {
-  addTask: (task: Omit<Task, 'id'>) => void;
-  updateTask: (id: string, updates: Partial<Task>) => void;
-  deleteTask: (id: string) => void;
-  selectTask: (task: Task | null) => void;
+type TaskAction =
+  | { type: 'ADD'; payload: Omit&lt;Task, 'id'&gt; }
+  | { type: 'UPDATE'; payload: { id: string; updates: Partial&lt;Task&gt; } }
+  | { type: 'DELETE'; payload: string }
+  | { type: 'SELECT'; payload: Task | null };
+
+const initialState: TaskState = { tasks: [], selectedTask: null };
+
+function taskReducer(state: TaskState, action: TaskAction): TaskState {
+  switch (action.type) {
+    case 'ADD':
+      return { ...state, tasks: [...state.tasks, { ...action.payload, id: crypto.randomUUID() }] };
+    case 'UPDATE':
+      return {
+        ...state,
+        tasks: state.tasks.map(t => t.id === action.payload.id ? { ...t, ...action.payload.updates } : t)
+      };
+    case 'DELETE':
+      return { ...state, tasks: state.tasks.filter(t => t.id !== action.payload) };
+    case 'SELECT':
+      return { ...state, selectedTask: action.payload };
+    default:
+      return state;
+  }
 }
 
-const TaskContext = createContext<TaskContextValue | null>(null);
+interface TaskContextValue extends TaskState {
+  addTask: (task: Omit&lt;Task, 'id'&gt;) =&gt; void;
+  updateTask: (id: string, updates: Partial&lt;Task&gt;) =&gt; void;
+  deleteTask: (id: string) =&gt; void;
+  selectTask: (task: Task | null) =&gt; void;
+}
+
+const TaskContext = createContext&lt;TaskContextValue | null&gt;(null);
 
 export function TaskProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(taskReducer, initialState);
@@ -480,6 +507,7 @@ function taskReducer(state: TaskState, action: TaskAction): TaskState {
 
           <section>
             <h2>Tipos de Componentes Avanzados</h2>
+            <p>Estos patrones van más allá de componentes simples: permiten crear APIs flexibles y reutilizables que requieren tipos estrictos para funcionar correctamente.</p>
             <ul>
               <li><strong>Componentes polimórficos:</strong> mismo componente puede renderizar como button, link, etc.</li>
               <li><strong>Compound components:</strong> API declarativa donde componentes hijos se comunican con el padre</li>
@@ -679,6 +707,7 @@ const { register, handleSubmit, formState: { errors } } = useForm&lt;Task&gt;({
 
           <section>
             <h2>¿Por qué tipar los hooks?</h2>
+            <p>Los hooks devuelven tipos inferidos, pero cuando el tipo no es obvio (null, arrays vacíos), necesitamos ser explícitos para evitar errores en runtime.</p>
             <ul>
               <li>Proporcionan autocompletado al usar el hook</li>
               <li>Definen claramente qué datos devuelve el hook</li>
@@ -1035,6 +1064,7 @@ export async function POST(request: NextRequest) {
 
           <section>
             <h2>¿Por qué esta combinación?</h2>
+            <p>React Hook Form performance + Zod validación runtime = formularios tipados de forma automática y performant.</p>
             <ul>
               <li><strong>React Hook Form:</strong> rendimiento óptimo (no re-renderiza en cada input)</li>
               <li><strong>Zod:</strong> validación en runtime con inferencia automática</li>
@@ -1112,6 +1142,7 @@ function FormularioRegistro() {
 
           <section>
             <h2>¿Por qué usarlos?</h2>
+            <p>Permiten crear tipos dinámicamente basándose en otros tipos: transformar, filtrar y validar en tiempo de compilación sin código runtime adicional.</p>
             <ul>
               <li><strong>Mapped Types:</strong> transformar propiedades de un tipo</li>
               <li><strong>Conditional Types:</strong> crear tipos que dependen de otros tipos</li>
