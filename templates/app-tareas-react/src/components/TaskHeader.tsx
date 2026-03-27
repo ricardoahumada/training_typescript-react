@@ -1,4 +1,8 @@
-// Lab 3A: TaskHeader
+// ============================================================
+// src/components/TaskHeader.tsx
+// ============================================================
+// Lab 3A -> ESTE COMPONENTE ESTA COMPLETO y FUNCIONAL
+
 import React from 'react';
 
 interface TaskStats {
@@ -14,22 +18,23 @@ interface TaskHeaderProps {
 
 export function TaskHeader({ stats }: TaskHeaderProps) {
   return (
-    <header className="app-header">
-      <h1>Sistema de Tareas</h1>
-      <div className="task-stats">
-        <span className="task-stats__item">
-          Total: <strong>{stats.total}</strong>
-        </span>
-        <span className="task-stats__item task-stats__item--pending">
-          Pendientes: <strong>{stats.pending}</strong>
-        </span>
-        <span className="task-stats__item task-stats__item--progress">
-          En Progreso: <strong>{stats.inProgress}</strong>
-        </span>
-        <span className="task-stats__item task-stats__item--completed">
-          Completadas: <strong>{stats.completed}</strong>
-        </span>
+    <div className="task-stats">
+      <div className="task-stats__item">
+        <div className="task-stats__value">{stats.total}</div>
+        <div className="task-stats__label">Total</div>
       </div>
-    </header>
+      <div className="task-stats__item">
+        <div className="task-stats__value">{stats.pending}</div>
+        <div className="task-stats__label">Pendientes</div>
+      </div>
+      <div className="task-stats__item">
+        <div className="task-stats__value">{stats.inProgress}</div>
+        <div className="task-stats__label">En Progreso</div>
+      </div>
+      <div className="task-stats__item">
+        <div className="task-stats__value">{stats.completed}</div>
+        <div className="task-stats__label">Completadas</div>
+      </div>
+    </div>
   );
 }

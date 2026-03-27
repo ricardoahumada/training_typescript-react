@@ -1,15 +1,24 @@
 // ============================================================
-// TODO (lab 8A): Hooks - Descomenta para activar
+// TODO (lab 12A): Test Setup - Descomenta para activar
 // ============================================================
 /*
 
 // ============================================================
-// src/hooks/index.ts - Barrel exports
+// tests/setup.ts - Setup de testing
 // ============================================================
 
-export { useTaskFilter } from './useTaskFilter';
+import '@testing-library/jest-dom';
+import { cleanup } from '@testing-library/react';
+import { afterEach, vi } from 'vitest';
+
+// Cleanup despues de cada test
+afterEach(() => {
+  cleanup();
+  vi.clearAllMocks();
+  vi.useRealTimers();
+});
 
 */
 // ============================================================
-// FIN TODO (lab 8A)
+// FIN TODO (lab 12A)
 // ============================================================

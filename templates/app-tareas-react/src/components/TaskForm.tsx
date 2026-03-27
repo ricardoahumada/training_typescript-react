@@ -1,5 +1,9 @@
-// Lab 3A: Componente TaskForm
-// Lab 4A: Se tipara con useState y eventos de formulario
+// ============================================================
+// src/components/TaskForm.tsx
+// ============================================================
+// Lab 3A -> ESTE COMPONENTE ESTA COMPLETO y FUNCIONAL
+// Lab 4A: Se mejora con validacion de formularios tipados
+
 import React, { useState } from 'react';
 import { TaskPriority } from '../types';
 

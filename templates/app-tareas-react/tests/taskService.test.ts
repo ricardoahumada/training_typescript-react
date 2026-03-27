@@ -1,12 +1,14 @@
 // ============================================================
-// Lab 12A: Tests Unitarios con Vitest
+// TODO (lab 12A): TaskService Tests - Descomenta para activar
 // ============================================================
-// Archivo de ejemplo para el laboratorio de testing
-// El alumno escribira los tests siguiendo el guion del Lab 12A
+/*
+
+// ============================================================
+// tests/taskService.test.ts - Tests unitarios para TaskService
+// ============================================================
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { TaskService, isTask, isTaskArray } from '../src/services/taskService';
-import { Task } from '../src/types';
+import { TaskService } from '../src/services/taskService';
 
 describe('TaskService', () => {
   let service: TaskService;
@@ -16,8 +18,8 @@ describe('TaskService', () => {
   });
 
   describe('createTask', () => {
-    it('should create a task with given title and priority', () => {
-      const task = service.createTask({ title: 'Nueva tarea', priority: 'high' });
+    it('should create a task with given title', () => {
+      const task = service.createTask('Nueva tarea', 'high');
 
       expect(task.title).toBe('Nueva tarea');
       expect(task.priority).toBe('high');
@@ -26,59 +28,96 @@ describe('TaskService', () => {
     });
 
     it('should generate unique ids', () => {
-      const task1 = service.createTask({ title: 'Tarea 1', priority: 'low' });
-      const task2 = service.createTask({ title: 'Tarea 2', priority: 'low' });
+      const task1 = service.createTask('Tarea 1', 'low');
+      const task2 = service.createTask('Tarea 2', 'low');
 
       expect(task1.id).not.toBe(task2.id);
     });
 
     it('should add task to internal list', () => {
-      service.createTask({ title: 'Tarea 1', priority: 'medium' });
-      service.createTask({ title: 'Tarea 2', priority: 'low' });
+      service.createTask('Tarea 1', 'medium');
+      service.createTask('Tarea 2', 'low');
 
       expect(service.getAll()).toHaveLength(2);
     });
   });
 
-  describe('fromAPI', () => {
-    it('should return null for invalid data', () => {
-      const result = service.fromAPI({ invalid: 'data' });
-      expect(result).toBeNull();
+  describe('getAll', () => {
+    it('should return empty array initially', () => {
+      const tasks = service.getAll();
+      expect(tasks).toHaveLength(0);
     });
 
-    it('should parse valid API data', () => {
-      const apiData = {
-        id: '1',
-        title: 'API Task',
-        status: 'pending',
-        priority: 'high',
-        createdAt: '2026-03-01T00:00:00Z',
-      };
+    it('should return a copy, not the original array', () => {
+      service.createTask('Tarea 1', 'low');
+      const tasks = service.getAll();
 
-      const task = service.fromAPI(apiData);
+      // Modifying returned array should not affect internal state
+      tasks.push({ id: 'fake', title: 'Fake', status: 'pending', priority: 'low', createdAt: new Date() });
 
-      expect(task).not.toBeNull();
-      expect(task!.title).toBe('API Task');
-      expect(task!.createdAt).toBeInstanceOf(Date);
+      expect(service.getAll()).toHaveLength(1);
     });
   });
 
-  describe('isTask', () => {
-    it('should return true for valid task', () => {
-      const task: Task = {
-        id: '1',
-        title: 'Test',
-        status: 'pending',
-        priority: 'medium',
-        createdAt: new Date(),
-      };
-      expect(isTask(task)).toBe(true);
+  describe('getById', () => {
+    it('should return undefined for non-existent id', () => {
+      const task = service.getById('non-existent');
+      expect(task).toBeUndefined();
     });
 
-    it('should return false for invalid object', () => {
-      expect(isTask({ title: 'No task' })).toBe(false);
-      expect(isTask(null)).toBe(false);
-      expect(isTask('string')).toBe(false);
+    it('should return task with given id', () => {
+      const created = service.createTask('Tarea 1', 'medium');
+      const found = service.getById(created.id);
+
+      expect(found).toEqual(created);
+    });
+  });
+
+  describe('update', () => {
+    it('should return undefined for non-existent id', () => {
+      const result = service.update('non-existent', { title: 'New' });
+      expect(result).toBeUndefined();
+    });
+
+    it('should update task with given id', () => {
+      const created = service.createTask('Tarea 1', 'medium');
+      const updated = service.update(created.id, { status: 'completed' });
+
+      expect(updated).toBeDefined();
+      expect(updated?.status).toBe('completed');
+      expect(updated?.title).toBe('Tarea 1'); // Other fields unchanged
+    });
+  });
+
+  describe('delete', () => {
+    it('should return false for non-existent id', () => {
+      const result = service.delete('non-existent');
+      expect(result).toBe(false);
+    });
+
+    it('should return true and remove task', () => {
+      const created = service.createTask('Tarea 1', 'medium');
+      const result = service.delete(created.id);
+
+      expect(result).toBe(true);
+      expect(service.getById(created.id)).toBeUndefined();
+    });
+  });
+
+  describe('filterByStatus', () => {
+    it('should return only tasks with matching status', () => {
+      service.createTask('Tarea 1', 'low');
+      service.createTask('Tarea 2', 'medium');
+      const task3 = service.createTask('Tarea 3', 'high');
+      service.update(task3.id, { status: 'completed' });
+
+      const pending = service.filterByStatus('pending');
+      expect(pending).toHaveLength(2);
     });
   });
 });
+
+*/
+// ============================================================
+// FIN TODO (lab 12A)
+// ============================================================

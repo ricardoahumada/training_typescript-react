@@ -1,19 +1,34 @@
 // ============================================================
-// vitest.config.ts - Lab 12A: Testing con Vitest
+// TODO (lab 12A): Vitest Config - Descomenta para activar
 // ============================================================
-// Configuracion para tests unitarios deterministas
-// Lab 12A ensenara a configurar y escribir tests
+/*
+
+// ============================================================
+// vitest.config.ts - Configuracion para testing con Vitest
+// ============================================================
 
 import { defineConfig } from 'vitest/config';
+import react from '@vitejs/plugin-react';
 
 export default defineConfig({
+  plugins: [react()],
   test: {
     globals: true,
-    environment: 'node',
-    include: ['tests/**/*.test.ts', 'tests/**/*.test.tsx'],
+    environment: 'happy-dom', // ⚡ Mas rapido que jsdom
+    setupFiles: ['./tests/setup.ts'],
+    isolate: true,
     coverage: {
+      provider: 'v8',
       reporter: ['text', 'json', 'html'],
-      exclude: ['node_modules/', 'dist/'],
+      exclude: [
+        'src/main.tsx',
+        'src/**/*.stories.tsx',
+        'src/**/*.test.tsx',
+        'src/vite-env.d.ts',
+        'tests/**',
+      ],
     },
-  },
-});
+    include: ['tests/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
+// ============================================================
+// FIN TODO (lab 12A)
+// ============================================================

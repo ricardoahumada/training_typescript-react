@@ -1,13 +1,17 @@
 // ============================================================
-// Lab 5A: Next.js App Router - SSR Page
+// TODO (lab 5A): Next.js Page - Descomenta para activar
 // ============================================================
-// Este archivo se creara en Lab 5A durante la migracion CSR -> SSR
-// Ubicacion: src/app/page.tsx (App Router de Next.js)
+/*
 
-import { Task } from '@/types';
+// ============================================================
+// src/app/page.tsx - Pagina principal con Server Components
+// ============================================================
 
+import { Task, TaskStatus, TaskPriority } from '@/types';
+
+// Server Component - puede ser async
 async function getTasks(): Promise<Task[]> {
-  // En Lab 5A: fetch real a API o base de datos
+  // En produccion, esto seria un fetch a tu API
   return [
     {
       id: '1',
@@ -19,17 +23,26 @@ async function getTasks(): Promise<Task[]> {
   ];
 }
 
-export default async function Page() {
+export default async function HomePage() {
   const tasks = await getTasks();
 
   return (
-    <main>
+    <main style={{ maxWidth: '800px', margin: '0 auto', padding: '24px' }}>
       <h1>Sistema de Tareas - SSR</h1>
+      <p>Esta pagina se renderiza en el servidor.</p>
+      
       <ul>
         {tasks.map((task) => (
-          <li key={task.id}>{task.title}</li>
+          <li key={task.id}>
+            {task.title} - <span>{task.status}</span> - <span>{task.priority}</span>
+          </li>
         ))}
       </ul>
     </main>
   );
 }
+
+*/
+// ============================================================
+// FIN TODO (lab 5A)
+// ============================================================

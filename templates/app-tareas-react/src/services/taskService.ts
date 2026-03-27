@@ -1,31 +1,19 @@
-// Lab 8A: TaskService - Type-safe service con type guards
-import { Task, TaskFromAPI, CreateTaskParams } from '../types';
+// ============================================================
+// src/services/taskService.ts - Servicio de Tareas
+// ============================================================
+// Lab 3A -> ESTE ARCHIVO ESTA COMPLETO y FUNCIONAL
+// Servicio base usado en tests (Lab 12A)
 
-// Lab 8A: Type guard para validar datos de API
-export function isTask(obj: unknown): obj is Task {
-  if (typeof obj !== 'object' || obj === null) return false;
-  const task = obj as Record<string, unknown>;
-  return (
-    typeof task.id === 'string' &&
-    typeof task.title === 'string' &&
-    typeof task.status === 'string' &&
-    typeof task.priority === 'string'
-  );
-}
+import { Task } from '../types';
 
-// Lab 8A: Type guard para array de API
-export function isTaskArray(obj: unknown): obj is Task[] {
-  return Array.isArray(obj) && obj.every(isTask);
-}
-
-// Lab 8A: Servicio que simula llamadas a API
 export class TaskService {
   private tasks: Task[] = [];
 
-  createTask(params: CreateTaskParams): Task {
+  createTask(title: string, priority: Task['priority']): Task {
     const task: Task = {
-      id: Date.now().toString(36),
-      ...params,
+      id: this.generateId(),
+      title,
+      priority,
       status: 'pending',
       createdAt: new Date(),
     };
@@ -37,25 +25,35 @@ export class TaskService {
     return [...this.tasks];
   }
 
-  // Lab 8A: Método que recibe datos de API (unknown)
-  fromAPI(data: unknown): Task | null {
-    if (!isTask(data)) {
-      console.error('Invalid task data from API');
-      return null;
-    }
-    return {
-      ...data,
-      createdAt: new Date(data.createdAt),
-      completedAt: data.completedAt ? new Date(data.completedAt) : undefined,
-    };
+  getById(id: string): Task | undefined {
+    return this.tasks.find((t) => t.id === id);
   }
 
-  // Lab 8A: Bulk from API
-  fromAPIArray(data: unknown): Task[] {
-    if (!isTaskArray(data)) {
-      console.error('Invalid task array from API');
-      return [];
-    }
-    return data.map((t) => this.fromAPI(t)!).filter(Boolean) as Task[];
+  update(id: string, updates: Partial<Task>): Task | undefined {
+    const index = this.tasks.findIndex((t) => t.id === id);
+    if (index === -1) return undefined;
+    
+    this.tasks[index] = { ...this.tasks[index], ...updates };
+    return this.tasks[index];
+  }
+
+  delete(id: string): boolean {
+    const index = this.tasks.findIndex((t) => t.id === id);
+    if (index === -1) return false;
+    
+    this.tasks.splice(index, 1);
+    return true;
+  }
+
+  filterByStatus(status: Task['status']): Task[] {
+    return this.tasks.filter((t) => t.status === status);
+  }
+
+  filterByPriority(priority: Task['priority']): Task[] {
+    return this.tasks.filter((t) => t.priority === priority);
+  }
+
+  private generateId(): string {
+    return Date.now().toString(36) + Math.random().toString(36).substr(2);
   }
 }

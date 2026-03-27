@@ -1,5 +1,9 @@
-// Lab 3A: Componente TaskCard
-// Lab 4A: Se tipara con props
+// ============================================================
+// src/components/TaskCard.tsx
+// ============================================================
+// Lab 3A -> ESTE COMPONENTE ESTA COMPLETO y FUNCIONAL
+// Lab 4A: Se enhance con Utility Types para las props
+
 import React from 'react';
 import { Task, TaskPriority } from '../types';
 

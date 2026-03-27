@@ -1,5 +1,6 @@
-/* Sistema de Tareas - CSS */
-/* Lab 3A: Estilos basicos - se expandiran en labs posteriores */
+/* ============================================================
+   styles.css - Sistema de Tareas Caso 1r
+   ============================================================ */
 
 * {
   box-sizing: border-box;
@@ -9,66 +10,78 @@
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: #f5f5f5;
+  background-color: #f5f5f5;
   color: #333;
+  line-height: 1.6;
 }
 
+#root {
+  min-height: 100vh;
+}
+
+/* App Container */
 .app {
   max-width: 900px;
   margin: 0 auto;
   padding: 20px;
 }
 
-/* Header */
 .app-header {
   text-align: center;
   margin-bottom: 30px;
-  padding: 20px;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .app-header h1 {
-  color: #2563eb;
-  margin-bottom: 15px;
+  font-size: 2rem;
+  color: #1a1a1a;
 }
 
+.app-main {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Task Stats */
 .task-stats {
   display: flex;
+  gap: 15px;
   justify-content: center;
-  gap: 20px;
   flex-wrap: wrap;
+  margin-bottom: 20px;
 }
 
 .task-stats__item {
-  padding: 5px 15px;
-  background: #f3f4f6;
-  border-radius: 20px;
-  font-size: 14px;
+  background: white;
+  padding: 10px 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  text-align: center;
 }
 
-.task-stats__item--pending { background: #fef3c7; color: #92400e; }
-.task-stats__item--progress { background: #dbeafe; color: #1e40af; }
-.task-stats__item--completed { background: #d1fae5; color: #065f46; }
-
-/* Main */
-.app-main {
-  display: grid;
-  gap: 20px;
+.task-stats__label {
+  font-size: 0.85rem;
+  color: #666;
 }
 
+.task-stats__value {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #333;
+}
+
+/* Panel */
 .panel {
   background: white;
   padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
 .panel h2 {
   margin-bottom: 15px;
-  color: #374151;
-  font-size: 18px;
+  font-size: 1.25rem;
+  color: #333;
 }
 
 /* Task Form */
@@ -81,95 +94,100 @@ body {
 .task-form__input {
   flex: 1;
   min-width: 200px;
-  padding: 10px 15px;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  font-size: 16px;
+  padding: 12px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+.task-form__input:focus {
+  outline: none;
+  border-color: #4a90d9;
 }
 
 .task-form__select {
-  padding: 10px 15px;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  font-size: 16px;
+  padding: 12px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 1rem;
   background: white;
 }
 
 .task-form__button {
-  padding: 10px 20px;
-  background: #2563eb;
+  padding: 12px 24px;
+  background: #4a90d9;
   color: white;
   border: none;
-  border-radius: 6px;
-  font-size: 16px;
+  border-radius: 8px;
+  font-size: 1rem;
   cursor: pointer;
   transition: background 0.2s;
 }
 
 .task-form__button:hover {
-  background: #1d4ed8;
+  background: #3a7fc4;
 }
 
 /* Task List */
 .task-list {
-  display: grid;
-  gap: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .task-list__empty {
   text-align: center;
   padding: 40px;
-  color: #9ca3af;
+  color: #888;
 }
 
 /* Task Card */
 .task-card {
-  padding: 15px;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
   background: #fafafa;
-  transition: transform 0.2s, box-shadow 0.2s;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 16px;
+  transition: box-shadow 0.2s;
 }
 
 .task-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
 .task-card--completed {
   opacity: 0.7;
-  background: #f9fafb;
+  background: #f0f0f0;
 }
 
 .task-card__header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
+  align-items: flex-start;
+  margin-bottom: 8px;
 }
 
 .task-card__title {
-  font-size: 16px;
-  font-weight: 600;
+  font-size: 1.1rem;
+  color: #333;
 }
 
 .task-card--completed .task-card__title {
   text-decoration: line-through;
-  color: #6b7280;
+  color: #888;
 }
 
 .task-card__priority {
-  padding: 3px 10px;
-  border-radius: 12px;
-  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
   color: white;
   text-transform: uppercase;
 }
 
 .task-card__description {
-  font-size: 14px;
-  color: #6b7280;
-  margin-bottom: 10px;
+  color: #666;
+  font-size: 0.9rem;
+  margin-bottom: 12px;
 }
 
 .task-card__footer {
@@ -179,25 +197,25 @@ body {
 }
 
 .task-card__status {
-  padding: 5px 10px;
-  border: 1px solid #d1d5db;
+  padding: 6px 12px;
+  border: 1px solid #ddd;
   border-radius: 4px;
-  font-size: 14px;
+  font-size: 0.9rem;
   background: white;
 }
 
 .task-card__delete {
-  width: 30px;
-  height: 30px;
+  width: 32px;
+  height: 32px;
   border: none;
-  background: #fee2e2;
-  color: #dc2626;
+  background: #fee;
+  color: #c00;
   border-radius: 4px;
-  font-size: 20px;
+  font-size: 1.2rem;
   cursor: pointer;
   transition: background 0.2s;
 }
 
 .task-card__delete:hover {
-  background: #fecaca;
+  background: #fdd;
 }

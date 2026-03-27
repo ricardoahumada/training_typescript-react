@@ -1,13 +1,13 @@
 // ============================================================
-// TODO (lab 8A): Hooks - Descomenta para activar
+// TODO (lab 8A): Contexts - Descomenta para activar
 // ============================================================
 /*
 
 // ============================================================
-// src/hooks/index.ts - Barrel exports
+// src/contexts/index.ts - Barrel exports
 // ============================================================
 
-export { useTaskFilter } from './useTaskFilter';
+export { TaskProvider, useTask } from './TaskContext';
 
 */
 // ============================================================

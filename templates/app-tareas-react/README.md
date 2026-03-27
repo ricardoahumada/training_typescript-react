@@ -1,192 +1,128 @@
-# Caso 1r: Sistema de Tareas - Plantilla Progresiva
+# Caso 1r: Sistema de Tareas - Plantilla con TODOs
 
-## Descripcion
+Plantilla para el Caso 1r del curso de TypeScript. Esta plantilla permite practicar labs de 3A a 12B descomentando bloques `// TODO (lab X.Y)`.
 
-Plantilla del **Sistema de Gestion de Tareas** (Caso 1r) para los labs de los anexos 3A a 12B. Esta plantilla tiene la estructura necesaria para implementar todas las evoluciones del caso practico.
-
-## Evolucion del Proyecto
-
-| Anexo | Tecnologia | Descripcion | Tu Tarea |
-|-------|------------|-------------|----------|
-| **3A** | Webpack + React (CSR) | Configurar bundling desde cero | Completar `webpack.config.js` y `tsconfig.json` |
-| **4A** | React 18 + TS 5 | Utility Types, hooks tipados | Tipar componentes con `useState<T>`, `Partial`, `Pick` |
-| **5A** | Next.js SSR | Migracion CSR -> SSR | Crear `src/app/` y `next.config.js` |
-| **8A** | Patrones TS | Type guards, contextos, Zod | Implementar validacion runtime |
-| **12A** | Vitest | Tests unitarios deterministas | Completar `vitest.config.ts` y escribir tests |
-| **12B** | Playwright | Tests E2E + Visual Regression | Completar `playwright.config.ts` y escribir e2e |
-
-## Estado Inicial (Lab 3A - TU Completas)
-
-### Estructura de Archivos
+## Estado Inicial
 
 ```
-caso1r-plantilla/
-├── public/
-│   └── index.html           ← HTML base (listo)
-├── src/
-│   ├── types/
-│   │   └── index.ts         ← Tipos del dominio (Task, User, enums)
-│   ├── components/
-│   │   ├── TaskCard.tsx     ← Componente tarjeta (tipos incomplete)
-│   │   ├── TaskList.tsx     ← Lista de tareas
-│   │   ├── TaskForm.tsx     ← Formulario nueva tarea
-│   │   ├── TaskHeader.tsx   ← Header con estadisticas
-│   │   └── index.ts
-│   ├── services/            ← (para 8A)
-│   │   └── taskService.ts   ← Service con type guards
-│   ├── contexts/            ← (para 8A)
-│   │   └── TaskContext.tsx  ← Contexto tipado
-│   ├── hooks/               ← (para 4A y 8A)
-│   │   └── index.ts         ← Hooks: useTaskFilter, useTaskSort
-│   ├── utils/               ← (para 8A)
-│   │   └── index.ts         ← Type guards y parsers
-│   ├── app/                 ← (para 5A - Next.js)
-│   │   └── page.tsx         ← SSR page (pre-creada)
-│   ├── App.tsx              ← Componente principal
-│   ├── index.tsx            ← Entry point webpack
-│   └── styles.css           ← Estilos basicos
-├── tests/                  ← (para 12A)
-├── e2e/                    ← (para 12B)
-├── webpack.config.js        ← COMPLETAR (Lab 3A)
-├── tsconfig.json            ← COMPLETAR (Lab 3A)
-├── vitest.config.ts         ← (listo para 12A)
-├── playwright.config.ts     ← (listo para 12B)
-└── package.json
+Estado: Webpack + React CSR FUNCIONAL
+npm install && npm run dev
 ```
 
-### Archivos a Completar en Lab 3A
+La plantilla inicia con **webpack y React completamente configurados y funcionando**. Los labs avanzados (4A, 5A, 8A, 12A, 12B) están comentados con `// TODO` y se activan descomentando.
 
-#### `webpack.config.js`
+## Evolución por Lab
 
-```javascript
-module.exports = {
-  entry: './src/index.tsx',
-  output: {
-    path: path.resolve(__dirname, 'dist'),
-    filename: 'bundle.[contenthash].js',
-    clean: true,
-  },
-  resolve: {
-    extensions: ['.tsx', '.ts', '.js'],
-    alias: { '@': path.resolve(__dirname, 'src') },
-  },
-  module: {
-    rules: [
-      {
-        test: /\.tsx?$/,
-        use: 'ts-loader',
-        exclude: /node_modules/,
-      },
-      {
-        test: /\.css$/,
-        use: ['style-loader', 'css-loader'],
-      },
-    ],
-  },
-  plugins: [new HtmlWebpackPlugin({ template: './public/index.html' })],
-  devServer: {
-    static: './dist',
-    port: 3000,
-    hot: true,
-  },
-  mode: 'development',
-};
-```
+| Lab | Concepto | Estado | Como activar |
+|-----|----------|--------|--------------|
+| **3A** | Webpack + React | ✅ COMPLETO | Ya funciona |
+| **4A** | Utility Types + TSX | 📝 TODO | Descomentar en `src/types/index.ts` y `src/components/*.tsx` |
+| **5A** | Next.js SSR | 📝 TODO | Descomentar `next.config.js`, `src/app/` |
+| **8A** | Patrones TS Avanzados | 📝 TODO | Descomentar `src/utils/`, `src/contexts/`, `src/hooks/` |
+| **12A** | Vitest | 📝 TODO | Descomentar `vitest.config.ts`, `tests/` |
+| **12B** | Playwright | 📝 TODO | Descomentar `playwright.config.ts`, `e2e/` |
 
-#### `tsconfig.json`
-
-```json
-{
-  "compilerOptions": {
-    "target": "ES2020",
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
-    "module": "ESNext",
-    "moduleResolution": "bundler",
-    "jsx": "react-jsx",
-    "strict": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true,
-    "outDir": "./dist"
-  },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist"]
-}
-```
-
-## Comandos
+## Quick Start
 
 ```bash
 # Instalar dependencias
 npm install
-npm install --save-dev webpack webpack-cli webpack-dev-server ts-loader css-loader style-loader html-webpack-plugin
 
-# Lab 3A: Desarrollo
+# Iniciar desarrollo (Webpack CSR)
 npm run dev
 
-# Lab 3A: Build
-npm run build
-
-# Lab 12A: Tests (despues de configurar vitest)
-npm test
-
-# Lab 12B: E2E (despues de instalar playwright)
-npx playwright test
+# Verificar tipos
+npm run typecheck
 ```
 
-## Dependencias por Anexo
+## Scripts Disponibles
 
-### Lab 3A (Webpack)
 ```bash
-npm install --save-dev webpack webpack-cli webpack-dev-server ts-loader css-loader style-loader html-webpack-plugin
+npm run dev          # Webpack dev server (CSR)
+npm run build        # Build produccion
+npm run typecheck    # Verificacion de tipos
+
+# Labs avanzados (descomentar primero):
+npm test             # Vitest (Lab 12A)
+npm run test:watch   # Vitest watch mode
+npm run test:e2e    # Playwright E2E (Lab 12B)
 ```
 
-### Lab 4A (React 18 + TS 5)
-- Ya tiene `@types/react`, `@types/react-dom`, `typescript` en devDependencies
+## Estructura de TODOs
 
-### Lab 5A (Next.js SSR)
-```bash
-npm install next react react-dom
-npm install --save-dev @types/react @types/react-dom
+### Lab 4A: Utility Types
+
+Descomenta en `src/types/index.ts`:
+```typescript
+// TODO (lab 4A.1): Utility Types
+export type CreateTaskParams = Omit<Task, 'id' | 'createdAt' | 'completedAt'>;
+export type EditTaskParams = Partial<Task>;
+export type TaskPreview = Pick<Task, 'id' | 'title' | 'status' | 'priority'>;
+export type TasksByPriority = Record<TaskPriority, Task[]>;
 ```
 
-### Lab 8A (Zod)
-```bash
-npm install zod
+### Lab 5A: Next.js SSR
+
+Descomenta:
+- `next.config.js`
+- `src/app/layout.tsx`
+- `src/app/page.tsx`
+- `src/app/api/tasks/route.ts`
+
+### Lab 8A: Patrones Avanzados
+
+Descomenta en `src/`:
+- `utils/typeGuards.ts` — Type guards para runtime
+- `utils/validators.ts` — Zod schemas
+- `contexts/TaskContext.tsx` — Context con tipos
+- `hooks/useTaskFilter.ts` — Hooks tipados
+
+### Lab 12A: Vitest
+
+Descomenta:
+- `vitest.config.ts`
+- `tests/setup.ts`
+- `tests/taskService.test.ts`
+
+### Lab 12B: Playwright
+
+Descomenta:
+- `playwright.config.ts`
+- `e2e/taskflows.spec.ts`
+
+## Tecnologias Incluidas
+
+```
+Dependencias:
+- react ^18.2.0
+- react-dom ^18.2.0
+- next ^14.2.0
+- zod ^3.23.0
+
+DevDependencies:
+- typescript ^5.3.3
+- webpack ^5.105.4
+- ts-loader ^9.5.4
+- vitest ^1.4.0
+- @playwright/test ^1.42.0
+- @testing-library/react ^14.2.0
 ```
 
-### Lab 12A (Vitest)
-```bash
-npm install --save-dev vitest @vitest/coverage-v8 jsdom @testing-library/react
+## Dominio: Sistema de Tareas
+
+```typescript
+type TaskStatus = 'pending' | 'inProgress' | 'completed';
+type TaskPriority = 'low' | 'medium' | 'high';
+
+interface Task {
+  id: string;
+  title: string;
+  description?: string;
+  status: TaskStatus;
+  priority: TaskPriority;
+  createdAt: Date;
+  completedAt?: Date;
+  dueDate?: Date;
+  tags?: string[];
+}
 ```
-
-### Lab 12B (Playwright)
-```bash
-npm install --save-dev @playwright/test
-npx playwright install --with-deps chromium
-```
-
-## Flujo de Desarrollo
-
-```
-1. npm install
-2. Completar webpack.config.js (Lab 3A)
-3. Completar tsconfig.json (Lab 3A)
-4. npm run dev  -> http://localhost:3000
-5. npm run build -> dist/
-```
-
-## Errores Comunes
-
-- **"Cannot find module 'react'"**: Falta configurar `tsconfig.json` con `lib: ["DOM"]`
-- **"JSX element implicitly has type 'any'"**: Falta `jsx: "react-jsx"` en tsconfig
-- **"ts-loader not found"**: No se instalaron las devDependencies de webpack
-
-## Para el Formador
-
-Esta plantilla sigue el enfoque **progresivo evolucionado**:
-- El alumno empieza con archivos vacios de configuracion
-- Los componentes React basicos YA existen pero sin tipado completo
-- La estructura de carpetas PARA TODOS los labs esta pre-creada
-- El alumno llena los TODOs en orden (3A -> 4A -> 5A -> 8A -> 12A -> 12B)

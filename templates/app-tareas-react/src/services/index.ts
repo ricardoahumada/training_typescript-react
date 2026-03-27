@@ -1,2 +1,5 @@
-// Services index
-export { TaskService, isTask, isTaskArray } from './taskService';
+// ============================================================
+// src/services/index.ts - Barrel exports
+// ============================================================
+
+export { TaskService } from './taskService';

@@ -1,5 +1,18 @@
-// Lab 3A: App.tsx - Sistema de Gestion de Tareas
-// EVOLUCION: 3A (CSR) -> 4A (tipado) -> 5A (Next.js SSR) -> 8A (patrones) -> 12A/12B (tests)
+// ============================================================
+// src/App.tsx - Sistema de Gestion de Tareas (Caso 1r)
+// ============================================================
+// 
+// Lab 3A -> ESTE ARCHIVO ESTA COMPLETO y FUNCIONAL
+// - Webpack entry point configurado
+// - Componentes TaskList, TaskForm, TaskCard integrados
+// - Estado local con useState
+//
+// Labs futuros:
+// - Lab 4A: Components se descomentan para tipado
+// - Lab 8A: Context y hooks se descomentan
+// - Lab 5A: Se migrara a Next.js app/
+//
+
 import React, { useState } from 'react';
 import { Task, TaskPriority, TaskStatus } from './types';
 import { TaskList } from './components/TaskList';
@@ -84,16 +97,23 @@ function App() {
 
   return (
     <div className="app">
-      <TaskHeader stats={stats} />
+      <header className="app-header">
+        <h1>Sistema de Tareas</h1>
+        <p>Caso 1r - React + TypeScript</p>
+      </header>
 
       <main className="app-main">
+        <section className="panel">
+          <TaskHeader stats={stats} />
+        </section>
+
         <section className="panel">
           <h2>Nueva Tarea</h2>
           <TaskForm onSubmit={handleAddTask} />
         </section>
 
         <section className="panel">
-          <h2>Tareas</h2>
+          <h2>Lista de Tareas</h2>
           <TaskList
             tasks={tasks}
             onStatusChange={handleStatusChange}
@@ -106,3 +126,52 @@ function App() {
 }
 
 export default App;
+
+// ============================================================
+// TODO (lab 8A.4): Context Provider - Descomenta para activar
+// ============================================================
+/*
+// Descomenta este bloque completo para usar TaskContext en lugar de props
+
+export function TaskProvider({ children }: { children: React.ReactNode }) {
+  const [tasks, setTasks] = useState<Task[]>(initialTasks);
+
+  const addTask = (title: string, priority: TaskPriority) => {
+    const newTask: Task = {
+      id: generateId(),
+      title,
+      priority,
+      status: 'pending',
+      createdAt: new Date(),
+    };
+    setTasks((prev) => [...prev, newTask]);
+  };
+
+  const updateStatus = (id: string, status: TaskStatus) => {
+    setTasks((prev) =>
+      prev.map((task) =>
+        task.id === id
+          ? { ...task, status, completedAt: status === 'completed' ? new Date() : task.completedAt }
+          : task
+      )
+    );
+  };
+
+  const deleteTask = (id: string) => {
+    setTasks((prev) => prev.filter((task) => task.id !== id));
+  };
+
+  return (
+    <TaskContext.Provider value={{ tasks, addTask, updateStatus, deleteTask }}>
+      {children}
+    </TaskContext.Provider>
+  );
+}
+
+// Para usar en componentes:
+// const { tasks, addTask } = useTask();
+
+*/
+// ============================================================
+// FIN TODO (lab 8A.4)
+// ============================================================
