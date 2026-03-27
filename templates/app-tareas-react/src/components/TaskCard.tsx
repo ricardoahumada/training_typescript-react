@@ -10,7 +10,7 @@ import { Task, TaskPriority } from '../types';
 interface TaskCardProps {
   task: Task;
   onStatusChange: (id: string, status: Task['status']) => void;
-  onDelete: (id: string) => void;
+  onDelete?: (id: string) => void;
 }
 
 const priorityColors: Record<TaskPriority, string> = {
@@ -19,7 +19,7 @@ const priorityColors: Record<TaskPriority, string> = {
   high: '#ef4444',
 };
 
-export function TaskCard({ task, onStatusChange, onDelete }: TaskCardProps) {
+export function TaskCard({ task, onStatusChange, onDelete=(t:string)=>{} }: TaskCardProps) {
   const isCompleted = task.status === 'completed';
 
   return (

@@ -4,7 +4,7 @@
 // Lab 3A -> ESTE COMPONENTE ESTA COMPLETO y FUNCIONAL
 // Lab 4A: Se enhance con tipado mas completo de useState<T>
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Task } from '../types';
 import { TaskCard } from './TaskCard';
 
@@ -40,10 +40,10 @@ export function TaskList({ tasks, onStatusChange, onDelete }: TaskListProps) {
 // ============================================================
 // TODO (lab 4A.3): Generic List - Descomenta para activar
 // ============================================================
-/*
+
 
 // Componente generico que funciona con cualquier lista tipada
-function List<T extends { id: string }>({
+export function List<T extends { id: string }>({
   items,
   renderItem,
   keyExtractor,
@@ -52,6 +52,8 @@ function List<T extends { id: string }>({
   renderItem: (item: T) => React.ReactNode;
   keyExtractor: (item: T) => string;
 }) {
+  const [elems, setElems] = useState<T[]>([]);
+  
   return (
     <div>
       {items.map((item) => (
@@ -64,7 +66,7 @@ function List<T extends { id: string }>({
 // Uso:
 // <List items={tasks} renderItem={(t) => <span>{t.title}</span>} keyExtractor={(t) => t.id} />
 
-*/
+
 // ============================================================
 // FIN TODO (lab 4A.3)
 // ============================================================

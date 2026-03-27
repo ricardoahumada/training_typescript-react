@@ -38,7 +38,7 @@ export interface User {
 // ============================================================
 // TODO (lab 4A.1): Utility Types - Descomenta para activar
 // ============================================================
-/*
+
 
 // Partial<Task> - todos los campos opcionales
 // Útil para updateTask(id, { title: 'nuevo' })
@@ -57,7 +57,7 @@ export type TaskPreview = Pick<Task, 'id' | 'title' | 'status' | 'priority'>;
 export type TasksByPriority = Record<TaskPriority, Task[]>;
 export type TasksByStatus = Record<TaskStatus, Task[]>;
 
-*/
+
 // ============================================================
 // FIN TODO (lab 4A.1)
 // ============================================================
@@ -65,7 +65,7 @@ export type TasksByStatus = Record<TaskStatus, Task[]>;
 // ============================================================
 // TODO (lab 4A.2): Generic Constraints - Descomenta para activar
 // ============================================================
-/*
+
 
 // Interfaz base con id para constraints genéricas
 export interface WithId {
@@ -79,7 +79,7 @@ export interface ListProps<T extends WithId> {
   keyExtractor: (item: T) => string;
 }
 
-*/
+
 // ============================================================
 // FIN TODO (lab 4A.2)
 // ============================================================
@@ -87,7 +87,7 @@ export interface ListProps<T extends WithId> {
 // ============================================================
 // TODO (lab 8A.1): Type Guards - Descomenta para activar
 // ============================================================
-/*
+
 
 // Type guard para validar TaskFromAPI
 export function isTask(obj: unknown): obj is Task {
@@ -106,7 +106,7 @@ export function isTaskArray(data: unknown): data is Task[] {
   return Array.isArray(data) && data.every(isTask);
 }
 
-*/
+
 // ============================================================
 // FIN TODO (lab 8A.1)
 // ============================================================

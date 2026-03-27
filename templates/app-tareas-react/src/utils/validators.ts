@@ -1,7 +1,7 @@
 // ============================================================
 // TODO (lab 8A.2): Zod Schemas - Descomenta para activar
 // ============================================================
-/*
+
 
 // ============================================================
 // src/utils/validators.ts - Validacion con Zod
@@ -51,7 +51,7 @@ export function validateUpdateTask(data: unknown) {
   return UpdateTaskSchema.safeParse(data);
 }
 
-*/
+
 // ============================================================
 // FIN TODO (lab 8A.2)
 // ============================================================
