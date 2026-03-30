@@ -1,0 +1,47 @@
+{
+  "compilerOptions": {
+    // Target para React 18
+    "target": "ES2020",
+    
+    // Librerias incluidas
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    
+    // Modulo ESNext para webpack
+    "module": "ESNext",
+    
+    // Resolucion bundler para webpack/vite
+    "moduleResolution": "bundler",
+    
+    // JSX para React 18
+    "jsx": "react-jsx",
+    
+    // Modo estricto
+    "strict": true,
+    
+    // Interoperabilidad ES modules
+    "esModuleInterop": true,
+    
+    // Saltar chequeos de tipos en node_modules
+    "skipLibCheck": true,
+    
+    // Nombres de archivos consistentes
+    "forceConsistentCasingInFileNames": true,
+    
+    // Modulos JSON
+    "resolveJsonModule": true,
+    
+    // Directorio de salida
+    "outDir": "./dist",
+    
+    // Carpeta raiz
+    "rootDir": "./src",
+    
+    // Paths para alias @/
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    }
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "tests", "e2e"]
+}

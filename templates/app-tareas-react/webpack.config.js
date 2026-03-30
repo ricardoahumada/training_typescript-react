@@ -10,64 +10,68 @@
 // - Lab 12A: Vitest (se creara vitest.config.ts)
 // - Lab 12B: Playwright (se creara playwright.config.ts)
 
-const path = require("path");
-const HtmlWebpackPlugin = require("html-webpack-plugin");
+const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 
-module.exports = {
-  // Entry point de la aplicacion
-  entry: "./src/index.tsx",
-
-  // Salida compilada
-  output: {
-    path: path.resolve(__dirname, "dist"),
-    filename: "bundle.[contenthash].js",
-    clean: true,
-  },
-
-  // Extensiones resueltas
-  resolve: {
-    extensions: [".tsx", ".ts", ".js"],
-    alias: {
-      "@": path.resolve(__dirname, "src"),
-    },
-  },
-
-  // Modulo de reglas
-  module: {
-    rules: [
-      {
-        test: /\.tsx?$/,
-        loader: "esbuild-loader",
-        options: {
-          loader: "tsx",
-          target: "es2020",
-        },
-        exclude: /node_modules/,
-      },
-      {
-        test: /\.css$/,
-        use: ["style-loader", "css-loader"],
-      },
-    ],
-  },
-
-  // Plugins
-  plugins: [
+module.exports = (env) => {
+  const plugins = [
     new HtmlWebpackPlugin({
-      template: "./public/index.html",
+      template: './public/index.html',
     }),
-    // new BundleAnalyzerPlugin()
-  ],
+  ];
+
+  // Bundle analyzer solo cuando se pasa --env analyze
+  if (env && env.analyze) {
+    plugins.push(new BundleAnalyzerPlugin());
+  }
+
+  return {
+    // Entry point de la aplicacion
+    entry: './src/index.tsx',
+
+    // Salida compilada
+    output: {
+      path: path.resolve(__dirname, 'dist'),
+      filename: 'bundle.[contenthash].js',
+      clean: true,
+    },
+
+    // Extensiones resueltas
+    resolve: {
+      extensions: ['.tsx', '.ts', '.js'],
+      alias: {
+        '@': path.resolve(__dirname, 'src'),
+      },
+    },
+
+    // Modulo de reglas
+    module: {
+      rules: [
+        {
+          test: /\.tsx?$/,
+          use: 'ts-loader',
+          exclude: /node_modules/,
+        },
+        {
+          test: /\.css$/,
+          use: ['style-loader', 'css-loader'],
+        },
+      ],
+    },
+
+    // Plugins
+    plugins,
+
 
   // Servidor de desarrollo
   devServer: {
-    static: "./dist",
+    static: './dist',
     port: 3000,
     hot: true,
     open: true,
   },
 
   // Modo de operacion
-  mode: "development",
+  mode: 'development',
 };

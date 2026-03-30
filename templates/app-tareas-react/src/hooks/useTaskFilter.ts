@@ -1,7 +1,7 @@
 // ============================================================
 // TODO (lab 8A.4): Hooks - Descomenta para activar
 // ============================================================
-
+/*
 
 // ============================================================
 // src/hooks/useTaskFilter.ts - Hook para filtrar tareas
@@ -10,7 +10,7 @@
 import { useState, useMemo } from 'react';
 import { Task, TaskStatus, TaskPriority } from '../types';
 
-export function useTaskFilter<T extends {id:string}>(tasks: T[]) {
+export function useTaskFilter(tasks: Task[]) {
   const [statusFilter, setStatusFilter] = useState<TaskStatus | 'all'>('all');
   const [priorityFilter, setPriorityFilter] = useState<TaskPriority | 'all'>('all');
 
@@ -31,7 +31,7 @@ export function useTaskFilter<T extends {id:string}>(tasks: T[]) {
   };
 }
 
-
+*/
 // ============================================================
 // FIN TODO (lab 8A.4)
 // ============================================================

@@ -1,0 +1,37 @@
+{
+  "name": "@course/caso1r-todos-solution",
+  "version": "1.0.0",
+  "description": "Caso 1r: Sistema de Tareas - Solución Next.js SSR",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui"
+  },
+  "dependencies": {
+    "next": "^14.2.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "@playwright/test": "^1.42.0",
+    "@testing-library/react": "^14.2.0",
+    "@testing-library/jest-dom": "^6.4.0",
+    "@vitest/coverage-v8": "^1.4.0",
+    "happy-dom": "^14.0.0",
+    "playwright": "^1.42.0",
+    "typescript": "^5.3.3",
+    "vitest": "^1.4.0"
+  }
+}

@@ -1,7 +1,7 @@
 // ============================================================
 // TODO (lab 8A.1): Type Guards - Descomenta para activar
 // ============================================================
-
+/*
 
 // ============================================================
 // src/utils/typeGuards.ts - Type Guards para validacion de runtime
@@ -48,7 +48,7 @@ export function isApiError(result: ApiResult): result is ApiError {
   return result.kind === 'error';
 }
 
-
+*/
 // ============================================================
 // FIN TODO (lab 8A.1)
 // ============================================================
